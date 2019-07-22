@@ -1,0 +1,79 @@
+html, body {
+  width: 480px;
+  height: 320px;
+  overflow: hidden;
+}
+
+a {
+  color: #2196f3;
+}
+
+svg {
+  fill: currentColor;
+  vertical-align: text-bottom;
+}
+
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak],
+.ng-cloak, .x-ng-cloak,
+.ng-hide:not(.ng-hide-animate) {
+  display: none !important;
+}
+
+.main {
+  text-align: center;
+}
+
+.results {
+  font-size: 2em;
+  left: 0;
+  margin: auto;
+  padding: 10px;
+  position: absolute;
+  right: 0;
+  width: 430px;
+}
+
+.hint {
+  bottom: 5px;
+  color: #aaa;
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  border-top: none;
+  color: #888;
+  margin: auto;
+  top: 111px;
+  left: 0;
+  right: 0;
+  text-align: left;
+  width: 452px;
+}
+
+.autocomplete-items div {
+  padding: 10px;
+  cursor: pointer;
+  background-color: #fff; 
+  border-bottom: 1px solid #ddd; 
+}
+
+.autocomplete-items div:hover {
+  /*when hovering an item:*/
+  background-color: #eee; 
+}
+
+.autocomplete-active {
+  /*when navigating through the items using the arrow keys:*/
+  background-color: DodgerBlue !important; 
+  color: #ffffff; 
+}
+
+.reviews {
+  right: 10px;
+  position: absolute;
+}

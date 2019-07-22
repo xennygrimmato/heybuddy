@@ -1,0 +1,82 @@
+[ng\:cloak],
+[ng-cloak],
+[data-ng-cloak],
+[x-ng-cloak],
+.ng-cloak,
+.x-ng-cloak,
+.ng-hide:not(.ng-hide-animate) {
+    display: none !important;
+}
+
+.material-icons.md-18 {
+    font-size: 18px;
+}
+
+.material-icons.md-24 {
+    font-size: 24px;
+}
+
+.material-icons.md-36 {
+    font-size: 36px;
+}
+
+.material-icons.md-48 {
+    font-size: 48px;
+}
+
+
+/* Icons */
+
+.primary-icon {
+    color: #2196f3;
+}
+
+.status-icon {
+    position: absolute;
+    right: 30px;
+}
+
+.success {
+    color: #0f9d58;
+}
+
+.warning {
+    color: #db4437;
+}
+
+.align-middle {
+    vertical-align: middle;
+}
+
+.align-bottom {
+    vertical-align: bottom;
+}
+
+
+/* Layouts */
+
+.plugin-title {
+    margin-bottom: 10px;
+}
+
+.card {
+    padding: 1em;
+    text-align: center;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.main-content {
+    margin: auto;
+    width: 50%;
+}
+
+.caption-text {
+    color: #666;
+}
+
+.hotword-input {
+    margin: 0;
+}

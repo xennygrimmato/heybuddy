@@ -1,0 +1,8 @@
+<md-card md-theme-watch class="card">
+  <span class="md-title plugin-title">
+    <i class="material-icons md-24 primary-icon align-bottom">{{plugin.icon}}</i> {{plugin.name}}
+  </span>
+  <span class="md-caption caption-text" ng-repeat="query in plugin.queries">
+    {{query}}
+  </span>
+</md-card>

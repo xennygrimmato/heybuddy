@@ -1,0 +1,14 @@
+.chrome-voice-assistant-icon input[type="text"]:focus,
+.chrome-voice-assistant-icon input[type="email"]:focus,
+.chrome-voice-assistant-icon input[type="number"]:focus,
+.chrome-voice-assistant-icon input[type="search"]:focus,
+.chrome-voice-assistant-icon input[type="tel"]:focus,
+.chrome-voice-assistant-icon input[type="url"]:focus,
+.chrome-voice-assistant-icon input:not([type]):focus {
+  background: url(https://www.gstatic.com/images/icons/material/system/1x/mic_googblue_24dp.png) no-repeat 98% 50% !important;
+}
+
+.chrome-voice-assistant-icon textarea:focus,
+.chrome-voice-assistant-icon [contenteditable]:focus {
+  background: url(https://www.gstatic.com/images/icons/material/system/1x/mic_googblue_24dp.png) no-repeat 98% 0% !important;
+}

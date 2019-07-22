@@ -1,0 +1,20 @@
+<md-card md-theme-watch class="card"
+    ng-class="{clickable: !option.disableClick}" ng-click="onClick()">
+  <i class="material-icons md-48 primary-icon">{{option.icon}}</i>
+  <i class="material-icons md-24 success status-icon"
+      ng-show="option.enabled">
+    check_circle
+  </i>
+  <i class="material-icons md-24 warning status-icon"
+      ng-show="!option.enabled">
+    warning
+  </i>
+  <span class="md-title">{{option.title}}</span>
+  <span class="md-caption" ng-show="option.enabled">
+    {{option.caption}}
+  </span>
+  <span class="md-caption warning" ng-show="!option.enabled">
+    {{option.errorCaption}}
+  </span>
+  <img src="/images/microphone_guide.png" ng-show="option.showScreenshot">
+</md-card>

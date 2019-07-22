@@ -1,0 +1,25 @@
+<!doctype html>
+
+<head>
+  <link href="styles/popup.css" rel="stylesheet" type="text/css">
+  <meta name="viewport" content="initial-scale=1" />
+  <title>Listening</title>
+</head>
+
+<body>
+  <div class="main">
+    <img src="images/baseline-mic-24px.svg">
+    <a class="reviews" href="https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem"
+      target="_blank">Review / Send feedbacks</a>
+    <form id="query-form" class="query-form">
+      <input id="results" class="results" autofocus="true" autocomplete="off" placeholder="Hi, how can I help you?">
+    </form>
+    <div class="hint">
+      <input type="checkbox" id="personalized-search">
+      <label for="personalized-search">Show personalized search suggestions</label>
+      &middot;
+      <a href="/options.html" target="_blank">See all supported commands</a>.
+    </div>
+  </div>
+  <script src="scripts/popup.js"></script>
+</body>
