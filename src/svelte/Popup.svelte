@@ -1,10 +1,7 @@
 <script>
-  import Textfield from "@smui/textfield";
-  import Icon from "@smui/textfield/icon/index";
-  import Checkbox from "@smui/checkbox";
-  import FormField from "@smui/form-field";
   import List, { Graphic, Item, Text } from "@smui/list";
   import { mdiMagnify, mdiHistory } from "@mdi/js";
+  import MdiIcon from "./MdiIcon.svelte";
 
   navigator.webkitGetUserMedia(
     {
@@ -19,32 +16,28 @@
     name: "chrome-voice-assistant-popup"
   });
 
+  const MAX_SUGGESTIONS = 6;
   let disableCache = false;
-  let personalizedSearch;
+  let personalizedSearch = true;
+  let activeIndex = -1;
   let query = "";
+  let placeholder = "Hi, how can I help you?";
   let suggestionsPromise;
 
   popupPort.onMessage.addListener(request => {
     switch (request.type) {
       case "RESULT":
-        processQuery(request.userSaid);
+        processUserSaid(request.userSaid);
         break;
       case "PENDING_RESULT":
-        // input.value = "";
-        // input.placeholder = request.userSaid;
+        query = "";
+        placeholder = request.userSaid;
         break;
       case "CLOSE":
         window.close();
         break;
     }
   });
-
-  const processQuery = value => {
-    // input.value = '';
-    // input.placeholder = value;
-    // showAutocomplete();
-    console.log(value);
-  };
 
   async function suggestSearch(val) {
     if (!val) {
@@ -66,7 +59,8 @@
     for (let token of autocompletion) {
       const term = token[0];
       let deletionToken = null;
-      if (token[3]) {
+      console.log(token);
+      if (token[3] && token[3].du) {
         deletionToken = `https://www.google.com${token[3].du}`;
       }
       const simpleTerm = term.replace("<b>", "").replace("</b>", "");
@@ -83,20 +77,61 @@
         query: item.query,
         deleteCallback: item.deletionToken
           ? () => {
-              fetch(item.deletionToken).then(() => {
-                showAutocomplete();
+              console.log(`Deleting ${item.deletionToken}`);
+              return fetch(item.deletionToken, {
+                mode: "cors",
+                cache: "no-cache",
+                credentials: "include"
               });
             }
           : undefined,
         type: item.deletionToken ? "history" : "search"
       });
     }
-    return outputList.slice(0, 5);
+    return outputList.slice(0, MAX_SUGGESTIONS);
   }
 
-  function selectSuggestion(suggestion) {
-    popupPort.postMessage({ type: "QUERY", query: suggestion.query });
-    // processQuery(suggestion.query);
+  function processQuery(q) {
+    popupPort.postMessage({ type: "QUERY", query: q });
+    processUserSaid(q);
+  }
+
+  function processUserSaid(q) {
+    input.value = '';
+    input.placeholder = q;
+  }
+
+  function removeSuggestion(suggestion) {
+    suggestion.deleteCallback().then(() => {
+      suggestionsPromise = suggestSearch(query);
+    });
+    event.stopPropagation();
+    return true;
+  }
+
+  async function onKeyDown(event) {
+    const suggestions = await suggestionsPromise;
+    switch (event.keyCode) {
+      case 40: // UP arrow
+        activeIndex = activeIndex + 1;
+        if (activeIndex >= suggestions.length) {
+          activeIndex = -1;
+        }
+        break;
+      case 38: // DOWN arrow
+        if (activeIndex < 0) {
+          activeIndex = suggestions.length;
+        }
+        activeIndex = activeIndex - 1;
+        break;
+      case 13:  // ENTER key
+        if (activeIndex > -1 && suggestions[activeIndex]) {
+          /* and simulate a click on the "active" item: */
+          processQuery(suggestions[activeIndex].query);
+        } else {
+          processQuery(query);
+        }
+    }
   }
 
   $: suggestionsPromise = suggestSearch(query);
@@ -104,7 +139,7 @@
 
 <style>
   :global(html) {
-    width: 520px;
+    width: 480px;
     height: 400px;
     overflow: hidden;
   }
@@ -117,8 +152,19 @@
     text-align: center;
   }
 
-  :global(.query-form .results) {
-    width: 100%;
+  .results {
+    font-size: 2em;
+    left: 0;
+    margin: auto;
+    padding: 10px;
+    position: absolute;
+    right: 0;
+    width: 430px;
+  }
+
+  .remove-link {
+    float: right;
+    margin-top: 4px;
   }
 
   .hint {
@@ -129,17 +175,13 @@
     right: 0;
   }
 
-  :global(.autocomplete-graphic) {
-    width: 32px;
-    margin: 0 5px 0 0;
-  }
-
   .autocomplete-items {
     position: absolute;
     border: 1px solid #ddd;
     border-bottom: none;
     border-top: none;
     color: #888;
+    font-size: 1.2em;
     margin: auto;
     top: 111px;
     left: 0;
@@ -149,19 +191,19 @@
   }
 
   .autocomplete-items div {
-    padding: 10px;
+    padding: 8px;
     cursor: pointer;
     background-color: #fff;
     border-bottom: 1px solid #ddd;
   }
 
   .autocomplete-items div:hover {
-    /*when hovering an item:*/
+    /* when hovering an item: */
     background-color: #eee;
   }
 
   .autocomplete-active {
-    /*when navigating through the items using the arrow keys:*/
+    /* when navigating through the items using the arrow keys: */
     background-color: DodgerBlue !important;
     color: #ffffff;
   }
@@ -181,65 +223,49 @@
     Review / Send feedbacks
   </a>
   <form class="query-form">
-    <Textfield
-      variant="outlined"
-      withLeadingIcon
+    <input
       class="results"
-      label="Hi, how can I help you?"
+      autofocus
       autocomplete="off"
-      input$autofocus
-      bind:value={query}>
-      <Icon>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24px"
-          height="24px"
-          viewBox="0 0 24 24">
-          <path d={mdiMagnify} />
-        </svg>
-      </Icon>
-    </Textfield>
+      placeholder={placeholder}
+      on:keydown={onKeyDown}
+      bind:value={query} />
 
     {#if suggestionsPromise}
       {#await suggestionsPromise then suggestions}
-        <List>
-          {#each suggestions as suggestion}
-            <Item
-              class="autocomplete-items"
-              on:SMUI:action={() => selectSuggestion(suggestion)}>
-              <Graphic class="autocomplete-graphic">
-                {#if suggestion.type === 'history'}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24">
-                    <path d={mdiHistory} />
-                  </svg>
-                {:else}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24">
-                    <path d={mdiMagnify} />
-                  </svg>
-                {/if}
-              </Graphic>
-              <Text>
-                {@html suggestion.query}
-              </Text>
-            </Item>
+        <div class="autocomplete-items">
+          {#each suggestions as suggestion, i}
+            <div
+              on:click={() => processQuery(suggestion.query)}
+              class:autocomplete-active={i === activeIndex}>
+              {#if suggestion.type === 'history'}
+                <MdiIcon size="24" icon={mdiHistory} />
+              {:else}
+                <MdiIcon size="24" icon={mdiMagnify} />
+              {/if}
+              {@html suggestion.query}
+              {#if suggestion.deleteCallback}
+                <a
+                  class="remove-link"
+                  href={void 0}
+                  on:click={() => removeSuggestion(suggestion)}>
+                  Remove
+                </a>
+              {/if}
+            </div>
           {/each}
-        </List>
+        </div>
       {/await}
     {/if}
 
     <div class="hint">
-      <FormField>
-        <Checkbox bind:checked={personalizedSearch} />
-        <span slot="label">Show personalized search suggestions</span>
-      </FormField>
+      <input
+        type="checkbox"
+        id="personalized-search"
+        bind:checked={personalizedSearch} />
+      <label for="personalized-search">
+        Show personalized search suggestions
+      </label>
       &middot;
       <a href="/options.html" target="_blank">See all supported commands</a>
       .

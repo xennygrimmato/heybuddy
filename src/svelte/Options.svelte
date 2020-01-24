@@ -1,9 +1,7 @@
-<script>
+<!-- <script>
   import Button from "@smui/button";
   import Textfield from "@smui/textfield";
-</script>
-
-<div>
+</script><div>
   <h1 class="md-headline">Chrome Voice Assistant</h1>
   <div layout="column">
     <option-card option="voiceOption" ng-hide="voiceOption.enabled" />
@@ -41,4 +39,4 @@
       Review / Send feedbacks
     </span>
   </md-button>
-</div>
+</div> -->
