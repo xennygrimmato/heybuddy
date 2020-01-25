@@ -1,13 +1,6 @@
 import annyang from "annyang";
 import { DEBUG, storage } from "./common";
-import "./plugins/tab";
-import "./plugins/media";
-import "./plugins/bookmark";
-import "./plugins/navigation";
-import "./plugins/page";
-import "./plugins/extension";
-import "./plugins/query";
-import { allPlugins } from "./plugins/plugin";
+import { allPlugins } from "./plugins/index";
 import NotificationManager from "./notification";
 import TextInputManager from "./text_input";
 

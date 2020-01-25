@@ -1,5 +1,3 @@
-import { registerPlugin } from "./plugin";
-
 /** ------- Search query ------- */
 const prependQueryPhrase = queries => {
   let updatedQueries = Array.from(queries);
@@ -11,7 +9,9 @@ const prependQueryPhrase = queries => {
   return updatedQueries;
 };
 
-registerPlugin({
+const plugins = [];
+
+plugins.push({
   name: "Image",
   icon: "photo",
   queries: [
@@ -40,7 +40,7 @@ registerPlugin({
   }
 });
 
-registerPlugin({
+plugins.push({
   name: "News",
   icon: "notifications",
   queries: ["news of Google", "news about technology", "news | today's news"],
@@ -67,7 +67,7 @@ registerPlugin({
   }
 });
 
-registerPlugin({
+plugins.push({
   name: "Maps & directions",
   icon: "map",
   queries: [
@@ -124,7 +124,7 @@ registerPlugin({
   }
 });
 
-registerPlugin({
+plugins.push({
   name: "Wikipedia",
   icon: "public",
   queries: ["about California", "wiki about the Universe", "wikipedia"],
@@ -154,7 +154,7 @@ registerPlugin({
   }
 });
 
-registerPlugin({
+plugins.push({
   name: "Video",
   icon: "movie",
   queries: ["video", "video of cats"],
@@ -188,7 +188,7 @@ registerPlugin({
   }
 });
 
-registerPlugin({
+plugins.push({
   name: "Music",
   icon: "audiotrack",
   queries: ["music", "play music"],
@@ -201,7 +201,7 @@ registerPlugin({
   }
 });
 
-registerPlugin({
+plugins.push({
   name: "Shopping",
   icon: "local_grocery_store",
   queries: ["shopping | buy something", "shop for paper towel"],
@@ -225,7 +225,7 @@ registerPlugin({
   }
 });
 
-registerPlugin({
+plugins.push({
   name: "Quick links",
   icon: "star",
   queries: ["go to Facebook", "open downloads", "open bookmarks"],
@@ -262,14 +262,14 @@ registerPlugin({
   }
 });
 
-registerPlugin({
+plugins.push({
   name: "Voice input",
   icon: "edit",
   queries: ["Submit", "<Anything to write>"],
   addCommandHandler: commander => {}
 });
 
-registerPlugin({
+plugins.push({
   name: "Search",
   icon: "search",
   queries: [
@@ -330,3 +330,5 @@ registerPlugin({
     );
   }
 });
+
+export default plugins;

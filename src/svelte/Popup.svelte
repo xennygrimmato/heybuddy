@@ -9,7 +9,7 @@
     },
     stream => {},
     () => {
-      // chrome.runtime.openOptionsPage();
+      chrome.runtime.openOptionsPage();
     }
   );
   const popupPort = chrome.runtime.connect(/* extensionId*/ undefined, {
