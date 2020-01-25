@@ -1,3 +1,16 @@
+import {
+  mdiCamera,
+  mdiNewspaper,
+  mdiMap,
+  mdiWikipedia,
+  mdiVideo,
+  mdiMusic,
+  mdiShopping,
+  mdiStar,
+  mdiPencil,
+  mdiMagnify
+} from "@mdi/js";
+
 /** ------- Search query ------- */
 const prependQueryPhrase = queries => {
   let updatedQueries = Array.from(queries);
@@ -13,7 +26,7 @@ const plugins = [];
 
 plugins.push({
   name: "Image",
-  icon: "photo",
+  icon: mdiCamera,
   queries: [
     "images of kittens",
     "pictures of puppies",
@@ -42,7 +55,7 @@ plugins.push({
 
 plugins.push({
   name: "News",
-  icon: "notifications",
+  icon: mdiNewspaper,
   queries: ["news of Google", "news about technology", "news | today's news"],
   addCommandHandler: commander => {
     commander.addCommands(
@@ -69,7 +82,7 @@ plugins.push({
 
 plugins.push({
   name: "Maps & directions",
-  icon: "map",
+  icon: mdiMap,
   queries: [
     "map of United States",
     "direction to Las Vegas",
@@ -126,7 +139,7 @@ plugins.push({
 
 plugins.push({
   name: "Wikipedia",
-  icon: "public",
+  icon: mdiWikipedia,
   queries: ["about California", "wiki about the Universe", "wikipedia"],
   addCommandHandler: commander => {
     commander.addCommands(["wikipedia"], () => {
@@ -156,7 +169,7 @@ plugins.push({
 
 plugins.push({
   name: "Video",
-  icon: "movie",
+  icon: mdiVideo,
   queries: ["video", "video of cats"],
   addCommandHandler: commander => {
     commander.addCommands(
@@ -190,7 +203,7 @@ plugins.push({
 
 plugins.push({
   name: "Music",
-  icon: "audiotrack",
+  icon: mdiMusic,
   queries: ["music", "play music"],
   addCommandHandler: commander => {
     commander.addCommands(["play music", "music"], () => {
@@ -203,7 +216,7 @@ plugins.push({
 
 plugins.push({
   name: "Shopping",
-  icon: "local_grocery_store",
+  icon: mdiShopping,
   queries: ["shopping | buy something", "shop for paper towel"],
   addCommandHandler: commander => {
     commander.addCommands(["shopping", "buy something"], () => {
@@ -227,7 +240,7 @@ plugins.push({
 
 plugins.push({
   name: "Quick links",
-  icon: "star",
+  icon: mdiStar,
   queries: ["go to Facebook", "open downloads", "open bookmarks"],
   addCommandHandler: commander => {
     commander.addCommands(
@@ -264,14 +277,14 @@ plugins.push({
 
 plugins.push({
   name: "Voice input",
-  icon: "edit",
+  icon: mdiPencil,
   queries: ["Submit", "<Anything to write>"],
   addCommandHandler: commander => {}
 });
 
 plugins.push({
   name: "Search",
-  icon: "search",
+  icon: mdiMagnify,
   queries: [
     "Search for <text> | Google <text>",
     "<query> on (Bing | Yahoo | Amazon | and others)",

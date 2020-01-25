@@ -1,7 +1,9 @@
+import { mdiTab } from "@mdi/js";
+
 const plugins = [
   {
     name: "Browser tab",
-    icon: "tab",
+    icon: mdiTab,
     queries: [
       "close tab",
       "close other tabs | close all tabs",
@@ -260,4 +262,4 @@ const plugins = [
   }
 ];
 
-module.exports = plugins;
+export default plugins;

@@ -1,7 +1,9 @@
+import { mdiFileFind } from "@mdi/js";
+
 const plugins = [
   {
     name: "Page control",
-    icon: "pageview",
+    icon: mdiFileFind,
     queries: [
       "zoom in | make it larger",
       "zoom out | make it smaller",

@@ -33,7 +33,7 @@ class Commander {
     this.enableHotwords_ = false;
     this.timer_ = undefined;
 
-    /** ------- Connection with popup window ------- */
+    /** ------- Connection with popup window / content script ------- */
     chrome.runtime.onConnect.addListener(port => {
       if (port.name == "chrome-voice-assistant-popup") {
         this.clearTimer();
@@ -49,38 +49,38 @@ class Commander {
           }
         });
       }
-      port.onMessage.addListener(request => {
-        console.log(request);
-        switch (request.type) {
-          case "START_TEXT_INPUT":
-            this.startListeningToTextInput();
-            this.notificationManager_.showMessage("Voice input mode started", {
-              requireInteraction: true
+    });
+
+    chrome.runtime.onMessage.addListener((request, sender) => {
+      switch (request.type) {
+        case "START_TEXT_INPUT":
+          this.startListeningToTextInput();
+          this.notificationManager_.showMessage("Voice input mode started", {
+            requireInteraction: true
+          });
+          break;
+        case "STOP_TEXT_INPUT":
+          this.notificationManager_.clearMessage();
+          this.startListeningToTriggerCommands();
+          break;
+        case "QUERY":
+          annyang.trigger(request.query);
+          break;
+        case "TAB_LOADED":
+          if (request.isMicEnabled && this.enableHotwords_) {
+            storage.get(["disableInfoPrompt"], result => {
+              if (result.disableInfoPrompt) {
+                return;
+              }
+              this.notificationManager_.showInfoMessage(
+                `Microphone may not work on ${getHost(
+                  sender.url
+                )} because hotword detection is enabled.`
+              );
             });
-            break;
-          case "STOP_TEXT_INPUT":
-            this.notificationManager_.clearMessage();
-            this.startListeningToTriggerCommands();
-            break;
-          case "QUERY":
-            annyang.trigger(request.query);
-            break;
-          case "TAB_LOADED":
-            if (request.isMicEnabled && this.enableHotwords_) {
-              storage.get(["disableInfoPrompt"], result => {
-                if (result.disableInfoPrompt) {
-                  return;
-                }
-                this.notificationManager_.showInfoMessage(
-                  `Microphone may not work on ${getHost(
-                    port.sender.url
-                  )} because hotword detection is enabled.`
-                );
-              });
-            }
-            break;
-        }
-      });
+          }
+          break;
+      }
     });
 
     storage.get(["hotword"], result => {

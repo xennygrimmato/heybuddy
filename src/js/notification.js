@@ -67,6 +67,12 @@ export default class NotificationManager {
   }
 
   showMessage(message, options = {}) {
+    console.log(message);
+    this.sendMessage({
+      type: "NOTIFICATION",
+      title: "Chrome Voice Assistant",
+      content: message
+    });
     if (this.notificationId_) {
       chrome.notifications.update(this.notificationId_, {
         message: message
@@ -78,16 +84,16 @@ export default class NotificationManager {
       Object.assign(
         {
           type: "basic",
-          iconUrl: "/icon_128.png",
+          iconUrl: "img/icon_128.png",
           title: "Chrome Voice Assistant",
           buttons: [
             {
               title: "Options & supported commands",
-              iconUrl: "images/baseline-settings-20px.svg"
+              iconUrl: "img/baseline-settings-20px.svg"
             },
             {
               title: "Review & send feedbacks",
-              iconUrl: "images/baseline-feedback-20px.svg"
+              iconUrl: "img/baseline-feedback-20px.svg"
             }
           ],
           message: message
@@ -118,6 +124,11 @@ export default class NotificationManager {
   }
 
   showInfoMessage(message) {
+    this.sendMessage({
+      type: "NOTIFICATION",
+      title: "Chrome Voice Assistant",
+      content: message
+    });
     if (this.infoNotificationId_) {
       chrome.notifications.update(this.infoNotificationId_, {
         message: message
@@ -128,16 +139,16 @@ export default class NotificationManager {
       "",
       {
         type: "basic",
-        iconUrl: "/icon_128.png",
+        iconUrl: "img/icon_128.png",
         title: "Chrome Voice Assistant",
         buttons: [
           {
             title: "Disable hotwords detection",
-            iconUrl: "images/baseline-mic_off-24px.svg"
+            iconUrl: "img/baseline-mic_off-24px.svg"
           },
           {
             title: "Don't show this again",
-            iconUrl: "images/baseline-notifications_off-24px.svg"
+            iconUrl: "img/baseline-notifications_off-24px.svg"
           }
         ],
         message: message
@@ -149,6 +160,12 @@ export default class NotificationManager {
   }
 
   showPermissionMessage(message) {
+    console.log(message);
+    this.sendMessage({
+      type: "NOTIFICATION",
+      title: "Chrome Voice Assistant",
+      content: message
+    });
     if (this.permissionNotificationId_) {
       chrome.notifications.update(this.permissionNotificationId_, {
         message: message
@@ -159,18 +176,32 @@ export default class NotificationManager {
       "",
       {
         type: "basic",
-        iconUrl: "/icon_128.png",
+        iconUrl: "img/icon_128.png",
         title: "Chrome Voice Assistant",
         buttons: [
           {
             title: "Request permission",
-            iconUrl: "images/baseline-build-24px.svg"
+            iconUrl: "img/baseline-build-24px.svg"
           }
         ],
         message: message
       },
       notificationId => {
         this.permissionNotificationId_ = notificationId;
+      }
+    );
+  }
+
+  sendMessage(request) {
+    chrome.tabs.query(
+      {
+        active: true
+      },
+      tabs => {
+        if (tabs.length > 0) {
+          const activeTab = tabs[0];
+          chrome.tabs.sendMessage(activeTab.id, request);
+        }
       }
     );
   }

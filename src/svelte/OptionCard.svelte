@@ -1,6 +1,7 @@
 <script>
   import Card, { Content, PrimaryAction, Media } from "@smui/card";
   import { mdiCheckCircle, mdiAlert } from "@mdi/js";
+  import { ICON_COLOR } from "../js/common";
   import MdiIcon from "./MdiIcon.svelte";
 
   export let option;
@@ -42,7 +43,7 @@
 <Card class="card">
   <PrimaryAction on:click={onClick} class="{!option.disableClick ? 'clickable' : ''}">
     <Media>
-      <MdiIcon size="48" icon={option.icon} color="#2196f3" />
+      <MdiIcon size="48" icon={option.icon} color={ICON_COLOR} />
       {#if option.enabled}
         <MdiIcon
           size="24"

@@ -1,7 +1,9 @@
+import { mdiBookmark } from "@mdi/js";
+
 const plugins = [
   {
     name: "Bookmark",
-    icon: "bookmark",
+    icon: mdiBookmark,
     queries: ["bookmark", "bookmark (this) page", "remove bookmark"],
     addCommandHandler: commander => {
       commander.addCommands(

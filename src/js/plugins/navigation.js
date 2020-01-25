@@ -1,7 +1,9 @@
+import { mdiArrowRight } from "@mdi/js";
+
 const plugins = [
   {
     name: "Navigation",
-    icon: "arrow_forward",
+    icon: mdiArrowRight,
     queries: ["go back", "go forward", "reload | refresh"],
     addCommandHandler: commander => {
       commander.addCommands(["go back"], query => {

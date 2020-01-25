@@ -1,7 +1,9 @@
+import { mdiPlayCircleOutline } from "@mdi/js";
+
 const plugins = [
   {
     name: "Media player",
-    icon: "play_circle_outline",
+    icon: mdiPlayCircleOutline,
     queries: [
       "pause | stop | play | resume",
       "volume up | volume down",

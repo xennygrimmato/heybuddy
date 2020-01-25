@@ -9,16 +9,18 @@
   } from "@mdi/js";
   import Card, { Content } from "@smui/card";
   import Textfield from "@smui/textfield";
+  import Tab, { Icon, Label as TabLabel } from "@smui/tab";
+  import TabBar from "@smui/tab-bar";
   import Button, { Label } from "@smui/button";
   import MdiIcon from "./MdiIcon.svelte";
   import OptionCard from "./OptionCard.svelte";
-  import { DEBUG, storage } from "../js/common";
+  import OptionPlugin from "./OptionPlugin.svelte";
+  import { DEBUG, ICON_COLOR, storage } from "../js/common";
   import { allPlugins } from "../js/plugins";
 
+  let tabs = ["Options", "Supported commands"];
+  let activeTab = tabs[0];
   let customHotword = "";
-  // $scope.onCustomHotwordChanged = (value) => {
-  //     storage.set({ customHotword: $scope.customHotword });
-  // };
 
   let voiceOption = {
     icon: mdiMicrophone,
@@ -130,11 +132,36 @@
   :global(.hotword-input) {
     width: 400px;
   }
+
+  :global(.reviews-button) {
+    float: right;
+  }
+
+  .flex-container {
+    display: flex;
+    flex-wrap: wrap;
+  }
 </style>
 
 <div class="main-content">
-  <h1 class="mdc-typography--headline5">Chrome Voice Assistant</h1>
-  <div layout="column">
+  <h1 class="mdc-typography--headline5">
+    Chrome Voice Assistant
+    <Button
+      class="reviews-button"
+      href="https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem"
+      target="_blank">
+      <MdiIcon size="24" icon={mdiComment} color={ICON_COLOR} />
+      &nbsp;
+      <Label color={ICON_COLOR}>Review / Send feedbacks</Label>
+    </Button>
+  </h1>
+
+  <TabBar {tabs} let:tab bind:active={activeTab}>
+    <Tab {tab}>
+      <Label>{tab}</Label>
+    </Tab>
+  </TabBar>
+  {#if activeTab === tabs[0]}
     {#if !voiceOption.enabled}
       <OptionCard option={voiceOption} />
     {/if}
@@ -165,16 +192,12 @@
           input$minlength="5" />
       </Content>
     </Card>
-  </div>
-  <h2 class="mdc-typography--headline5">Supported commands</h2>
-  <!-- <div layout="row" layout-align="center center" layout-wrap>
-  <option-plugin flex="50" ng-repeat="plugin in plugins" plugin="plugin" />
-</div> -->
-
-  <Button
-    href="https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem"
-    target="_blank">
-    <MdiIcon size="24" icon={mdiComment} color="#2196f3" />&nbsp;
-    <Label color="#2196f3">Review / Send feedbacks</Label>
-  </Button>
+  {/if}
+  {#if activeTab === tabs[1]}
+    <div class="flex-container">
+      {#each allPlugins as plugin}
+        <OptionPlugin {plugin} />
+      {/each}
+    </div>
+  {/if}
 </div>

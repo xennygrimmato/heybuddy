@@ -1,5 +1,4 @@
 <script>
-  import List, { Graphic, Item, Text } from "@smui/list";
   import { mdiMagnify, mdiHistory } from "@mdi/js";
   import MdiIcon from "./MdiIcon.svelte";
 

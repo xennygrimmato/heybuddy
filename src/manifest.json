@@ -20,6 +20,19 @@
     "open_in_tab": true,
     "page": "options.html"
   },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["mic_detection_contents.bundle.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "all_frames": true,
+      "js": ["contents.bundle.js"],
+      "run_at": "document_end"
+    }
+  ],
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {
