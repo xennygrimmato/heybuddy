@@ -56,143 +56,90 @@ export default class NotificationManager {
   }
 
   hasMessage() {
-    return this.notificationId_;
+    // return this.notificationId_;
+    return true;
   }
 
   clearMessage() {
-    if (this.notificationId_) {
-      chrome.notifications.clear(this.notificationId_);
-      this.notificationId_ = undefined;
-    }
-  }
-
-  showMessage(message, options = {}) {
-    console.log(message);
     this.sendMessage({
-      type: "NOTIFICATION",
-      title: "Chrome Voice Assistant",
-      content: message
+      type: "CLEAR_NOTIFICATION"
     });
-    if (this.notificationId_) {
-      chrome.notifications.update(this.notificationId_, {
-        message: message
-      });
-      return;
-    }
-    chrome.notifications.create(
-      "",
-      Object.assign(
-        {
-          type: "basic",
-          iconUrl: "img/icon_128.png",
-          title: "Chrome Voice Assistant",
-          buttons: [
-            {
-              title: "Options & supported commands",
-              iconUrl: "img/baseline-settings-20px.svg"
-            },
-            {
-              title: "Review & send feedbacks",
-              iconUrl: "img/baseline-feedback-20px.svg"
-            }
-          ],
-          message: message
-        },
-        options
-      ),
-      notificationId => {
-        this.notificationId_ = notificationId;
-      }
-    );
   }
 
-  updateNotification(updateOptions) {
-    if (this.notificationId_) {
-      chrome.notifications.update(this.notificationId_, updateOptions);
-    }
-  }
-
-  updateMessage(message) {
-    this.updateNotification({ message: message });
-  }
-
-  clearInfoMessage() {
-    if (this.infoNotificationId_) {
-      chrome.notifications.clear(this.infoNotificationId_);
-      this.infoNotificationId_ = undefined;
-    }
+  showMessage(message) {
+    this.sendMessage(message);
   }
 
   showInfoMessage(message) {
     this.sendMessage({
-      type: "NOTIFICATION",
-      title: "Chrome Voice Assistant",
+      type: "INFO_NOTIFICATION",
+      title: "Notice",
       content: message
     });
-    if (this.infoNotificationId_) {
-      chrome.notifications.update(this.infoNotificationId_, {
-        message: message
-      });
-      return;
-    }
-    chrome.notifications.create(
-      "",
-      {
-        type: "basic",
-        iconUrl: "img/icon_128.png",
-        title: "Chrome Voice Assistant",
-        buttons: [
-          {
-            title: "Disable hotwords detection",
-            iconUrl: "img/baseline-mic_off-24px.svg"
-          },
-          {
-            title: "Don't show this again",
-            iconUrl: "img/baseline-notifications_off-24px.svg"
-          }
-        ],
-        message: message
-      },
-      notificationId => {
-        this.infoNotificationId_ = notificationId;
-      }
-    );
+    // if (this.infoNotificationId_) {
+    //   chrome.notifications.update(this.infoNotificationId_, {
+    //     message: message
+    //   });
+    //   return;
+    // }
+    // chrome.notifications.create(
+    //   "",
+    //   {
+    //     type: "basic",
+    //     iconUrl: "img/icon_128.png",
+    //     title: "Chrome Voice Assistant",
+    //     buttons: [
+    //       {
+    //         title: "Disable hotwords detection",
+    //         iconUrl: "img/baseline-mic_off-24px.svg"
+    //       },
+    //       {
+    //         title: "Don't show this again",
+    //         iconUrl: "img/baseline-notifications_off-24px.svg"
+    //       }
+    //     ],
+    //     message: message
+    //   },
+    //   notificationId => {
+    //     this.infoNotificationId_ = notificationId;
+    //   }
+    // );
   }
 
   showPermissionMessage(message) {
-    console.log(message);
     this.sendMessage({
       type: "NOTIFICATION",
-      title: "Chrome Voice Assistant",
+      title: "Permission needed",
       content: message
     });
-    if (this.permissionNotificationId_) {
-      chrome.notifications.update(this.permissionNotificationId_, {
-        message: message
-      });
-      return;
-    }
-    chrome.notifications.create(
-      "",
-      {
-        type: "basic",
-        iconUrl: "img/icon_128.png",
-        title: "Chrome Voice Assistant",
-        buttons: [
-          {
-            title: "Request permission",
-            iconUrl: "img/baseline-build-24px.svg"
-          }
-        ],
-        message: message
-      },
-      notificationId => {
-        this.permissionNotificationId_ = notificationId;
-      }
-    );
+    // if (this.permissionNotificationId_) {
+    //   chrome.notifications.update(this.permissionNotificationId_, {
+    //     message: message
+    //   });
+    //   return;
+    // }
+    // chrome.notifications.create(
+    //   "",
+    //   {
+    //     type: "basic",
+    //     iconUrl: "img/icon_128.png",
+    //     title: "Chrome Voice Assistant",
+    //     buttons: [
+    //       {
+    //         title: "Request permission",
+    //         iconUrl: "img/baseline-build-24px.svg"
+    //       }
+    //     ],
+    //     message: message
+    //   },
+    //   notificationId => {
+    //     this.permissionNotificationId_ = notificationId;
+    //   }
+    // );
   }
 
   sendMessage(request) {
+    chrome.runtime.sendMessage(request);
     chrome.tabs.query(
       {
         active: true

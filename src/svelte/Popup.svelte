@@ -11,7 +11,7 @@
       chrome.runtime.openOptionsPage();
     }
   );
-  const popupPort = chrome.runtime.connect(/* extensionId*/ undefined, {
+  const popupPort = chrome.runtime.connect({
     name: "chrome-voice-assistant-popup"
   });
 
@@ -23,14 +23,14 @@
   let placeholder = "Hi, how can I help you?";
   let suggestionsPromise;
 
-  popupPort.onMessage.addListener(request => {
+  chrome.runtime.onMessage.addListener(request => {
     switch (request.type) {
       case "RESULT":
-        processUserSaid(request.userSaid);
+        processUserSaid(request.content);
         break;
       case "PENDING_RESULT":
         query = "";
-        placeholder = request.userSaid;
+        placeholder = request.content;
         break;
       case "CLOSE":
         window.close();
@@ -58,7 +58,6 @@
     for (let token of autocompletion) {
       const term = token[0];
       let deletionToken = null;
-      console.log(token);
       if (token[3] && token[3].du) {
         deletionToken = `https://www.google.com${token[3].du}`;
       }
@@ -76,7 +75,6 @@
         query: item.query,
         deleteCallback: item.deletionToken
           ? () => {
-              console.log(`Deleting ${item.deletionToken}`);
               return fetch(item.deletionToken, {
                 mode: "cors",
                 cache: "no-cache",
@@ -91,13 +89,13 @@
   }
 
   function processQuery(q) {
-    popupPort.postMessage({ type: "QUERY", query: q });
+    chrome.runtime.sendMessage({ type: "QUERY", query: q });
     processUserSaid(q);
   }
 
   function processUserSaid(q) {
-    input.value = '';
-    input.placeholder = q;
+    query = '';
+    placeholder = q;
   }
 
   function removeSuggestion(suggestion) {
@@ -130,6 +128,7 @@
         } else {
           processQuery(query);
         }
+        break;
     }
   }
 
@@ -201,7 +200,8 @@
     background-color: #eee;
   }
 
-  .autocomplete-active {
+  .autocomplete-active,
+  .autocomplete-active .remove-link {
     /* when navigating through the items using the arrow keys: */
     background-color: DodgerBlue !important;
     color: #ffffff;
@@ -221,7 +221,7 @@
     target="_blank">
     Review / Send feedbacks
   </a>
-  <form class="query-form">
+  <div class="query-form">
     <input
       class="results"
       autofocus
@@ -269,5 +269,5 @@
       <a href="/options.html" target="_blank">See all supported commands</a>
       .
     </div>
-  </form>
+  </div>
 </div>

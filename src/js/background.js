@@ -1,4 +1,4 @@
-import annyang from "annyang";
+import annyang from "./annyang";
 import { DEBUG, storage } from "./common";
 import { allPlugins } from "./plugins/index";
 import NotificationManager from "./notification";
@@ -16,6 +16,14 @@ class Commander {
     if (DEBUG) {
       annyang.debug(true);
     }
+    annyang.addGrammars(
+      "#JSGF V1.0; grammar triggers; public <trigger> = hey buddy;"
+    );
+    for (const plugin of allPlugins) {
+      if (plugin.grammars) {
+        annyang.addGrammars(plugin.grammars);
+      }
+    }
 
     this.notificationManager_ = new NotificationManager({
       onRequestPermission: () => {
@@ -31,14 +39,13 @@ class Commander {
     this.popupPort_ = undefined;
     this.lastRequestedPermissions_ = undefined;
     this.enableHotwords_ = false;
-    this.timer_ = undefined;
+    this.commandPriorities_ = {};
 
     /** ------- Connection with popup window / content script ------- */
     chrome.runtime.onConnect.addListener(port => {
       if (port.name == "chrome-voice-assistant-popup") {
         this.clearTimer();
         this.notificationManager_.clearMessage();
-        this.notificationManager_.clearInfoMessage();
         this.popupPort_ = port;
         this.startListeningToAllCommands();
         annyang.start();
@@ -53,10 +60,17 @@ class Commander {
 
     chrome.runtime.onMessage.addListener((request, sender) => {
       switch (request.type) {
+        case "OPEN_URL":
+          chrome.tabs.create({
+            url: request.url
+          });
+          break;
         case "START_TEXT_INPUT":
           this.startListeningToTextInput();
-          this.notificationManager_.showMessage("Voice input mode started", {
-            requireInteraction: true
+          this.notificationManager_.showMessage({
+            type: "START_LISTENING",
+            title: "Listening",
+            content: "Voice input mode started"
           });
           break;
         case "STOP_TEXT_INPUT":
@@ -115,11 +129,6 @@ class Commander {
 
     // Send the result to the popup.
     annyang.addCallback("resultMatch", userSaid => {
-      this.clearTimer();
-      this.timer_ = setTimeout(() => {
-        this.sendMessage({ type: "CLOSE" });
-        this.notificationManager_.clearMessage();
-      }, 2000);
       this.sendResultMessage(userSaid);
       this.lastCommand_ = userSaid;
     });
@@ -127,12 +136,7 @@ class Commander {
     annyang.addCallback("result", results => {
       const result = results[0];
       if (result) {
-        this.sendMessage({ type: "PENDING_RESULT", userSaid: result });
-        this.notificationManager_.updateMessage(result);
-        if (this.timer_) {
-          clearTimeout(this.timer_);
-          this.timer_ = undefined;
-        }
+        this.sendMessage({ type: "PENDING_RESULT", title: "Listening", content: result });
       }
     });
 
@@ -164,15 +168,30 @@ class Commander {
   }
 
   startListeningToAllCommands() {
-    annyang.addCommands(this.regularCommands_);
+    for (const key in this.regularCommands_) {
+      annyang.addCommands(
+        { [key]: this.regularCommands_[key] },
+        this.commandPriorities_[key]
+      );
+    }
   }
 
   startListeningToTriggerCommands() {
     this.initTriggerCommands_().then(() => {
       this.initRegularCommands_();
       annyang.removeCommands();
-      annyang.addCommands(this.triggerCommands_);
-      annyang.addCommands(this.commandsWithTrigger_);
+      for (const key in this.triggerCommands_) {
+        annyang.addCommands(
+          { [key]: this.triggerCommands_[key] },
+          this.commandPriorities_[key]
+        );
+      }
+      for (const key in this.commandsWithTrigger_) {
+        annyang.addCommands(
+          { [key]: this.commandsWithTrigger_[key] },
+          this.commandPriorities_[key]
+        );
+      }
       storage.get(["hotword"], result => {
         if (!result.hotword) {
           if (annyang.isListening()) {
@@ -184,14 +203,11 @@ class Commander {
   }
 
   sendMessage(messsage) {
-    if (this.popupPort_) {
-      this.popupPort_.postMessage(messsage);
-    }
+    this.notificationManager_.showMessage(messsage);
   }
 
   sendResultMessage(userSaid) {
-    this.sendMessage({ type: "RESULT", userSaid: userSaid });
-    this.notificationManager_.updateMessage(userSaid);
+    this.sendMessage({ type: "RESULT", title: "Listening", content: userSaid });
   }
 
   /** ------- Helper functions to perform actions ------- */
@@ -265,31 +281,38 @@ class Commander {
   /** ------- Handle Triggering commands ------- */
   initTriggerCommands_() {
     const triggerFunction = () => {
-      if (this.notificationManager_.hasMessage()) {
-        this.performActionWithDelay(() => {
-          this.sendResultMessage("Yes? I am listening.");
-        });
-        return;
-      }
-      this.notificationManager_.showMessage("Hi, how can I help you?");
+      // if (this.notificationManager_.hasMessage()) {
+      //   this.performActionWithDelay(() => {
+      //     this.sendResultMessage("Yes? I am listening.");
+      //   });
+      //   return;
+      // }
+      this.notificationManager_.showMessage({
+        type: "START_LISTENING",
+        title: "Listening",
+        content: "Hi, how can I help you?"
+      });
       this.startListeningToAllCommands();
     };
     return new Promise((resolve, reject) => {
+      const hotword = "hey buddy";
       this.triggerCommands_ = {
-        "hey buddy": triggerFunction
+        [hotword]: triggerFunction
       };
+      this.commandPriorities_[hotword] = 1;
       storage.get(["customHotword"], result => {
         if (result.customHotword) {
           this.triggerCommands_[
             result.customHotword.toLowerCase()
           ] = triggerFunction;
+          this.commandPriorities_[result.customHotword.toLowerCase()] = 1;
         }
         resolve();
       });
     });
   }
 
-  addCommands(commandList, commandFunction) {
+  addCommands(commandList, commandFunction, { priority = 0.5 } = {}) {
     for (let command of commandList) {
       if (command.trim() != command) {
         console.error(`${command} should be trimmed`);
@@ -298,12 +321,15 @@ class Commander {
         console.error(`${command} has already been added`);
       }
       this.regularCommands_[command] = commandFunction;
+      this.commandPriorities_[command] = priority;
 
       // Combine the individual commands with triggering commands, allowing the user
       // to trigger an action with the triggering hotword prefix.
       for (let triggerKey in this.triggerCommands_) {
         const triggerFunction = this.triggerCommands_[triggerKey];
-        this.commandsWithTrigger_[triggerKey + " " + command] = query => {
+        const triggerAndCommand = triggerKey + " " + command;
+        this.commandPriorities_[triggerAndCommand] = priority;
+        this.commandsWithTrigger_[triggerAndCommand] = query => {
           triggerFunction(query);
           this.performActionWithDelay(() => {
             this.sendResultMessage(
@@ -325,14 +351,6 @@ class Commander {
     this.addCommands(["bye", "bye bye", "goodbye", "good bye", "close"], () => {
       this.sendMessage({ type: "CLOSE" });
       this.notificationManager_.clearMessage();
-    });
-
-    this.addCommands(["stay open"], () => {
-      this.notificationManager_.clearMessage();
-      this.notificationManager_.showMessage(
-        "OK, I will stay open until dismissed.",
-        { requireInteraction: true }
-      );
     });
 
     for (const plugin of allPlugins) {

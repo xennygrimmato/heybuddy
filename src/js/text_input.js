@@ -60,6 +60,6 @@ export default class TextInputManager {
           }
         `);
       }
-    });
+    }, /* priority */ .2);
   }
 }

@@ -1,4 +1,4 @@
-import App from "../svelte/Notification.svelte";
+import App from "../svelte/ContentsIframe.svelte";
 
 const app = new App({
   target: document.body

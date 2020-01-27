@@ -12,13 +12,19 @@ const plugins = [
       "maximize window | minimize window",
       "enter fullscreen | exit fullscreen"
     ],
+    grammars: [
+      "#JSGF V1.0; grammar tabs; public <tab> = close tab | close other tabs | close all tabs;"
+    ],
     addCommandHandler: commander => {
       /** ------- Tab management commands ------- */
-      commander.addCommands(["open new tab"], () => {
-        commander.performActionWithDelay(() => {
-          chrome.tabs.create({});
-        });
-      });
+      commander.addCommands(
+        ["open new tab"],
+        () => {
+          commander.performActionWithDelay(() => {
+            chrome.tabs.create({});
+          });
+        }
+      );
 
       commander.addCommands(
         ["close tab", "close this tab", "close the tab"],
@@ -35,7 +41,8 @@ const plugins = [
               }
             );
           });
-        }
+        },
+        { priority: 1 }
       );
 
       commander.addCommands(

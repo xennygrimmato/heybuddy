@@ -13,6 +13,9 @@ const plugins = [
       "scroll up | page up",
       "go to top | go to bottom"
     ],
+    grammars: [
+      "#JSGF V1.0; grammar pages; public <page> = zoom in | zoom out | page up | page down | scroll up | scroll down"
+    ],
     addCommandHandler: commander => {
       const ZOOM_LEVEL = [
         0.25,

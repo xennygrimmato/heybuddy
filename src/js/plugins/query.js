@@ -314,7 +314,8 @@ plugins.push({
           commander.performActionWithDelay(() => {
             commander.openTabWithUrl(siteToUrl[key] + query);
           });
-        }
+        },
+        { priority: .3 },
       );
     }
     commander.addCommands(
@@ -327,11 +328,12 @@ plugins.push({
       (query, site) => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl(
-            "https://www.google.com/search?btnI=1&q=" +
+            "https://duckduckgo.com/?q=!" +
               encodeURIComponent(query + " on " + site)
           );
         });
-      }
+      },
+      { priority: .3 },
     );
     commander.addCommands(
       ["search for *query", "google *query", "*query"],
@@ -339,7 +341,8 @@ plugins.push({
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl("https://www.google.com/search?q=" + query);
         });
-      }
+      },
+      { priority: .2 },
     );
   }
 });

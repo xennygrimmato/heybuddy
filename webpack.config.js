@@ -35,8 +35,9 @@ var options = {
     popup: path.join(__dirname, "src", "js", "popup.js"),
     options: path.join(__dirname, "src", "js", "options.js"),
     background: path.join(__dirname, "src", "js", "background.js"),
-    mic_detection_contents: path.join(__dirname, "src", "js", "mic_detection_contents.js"),
-    contents: path.join(__dirname, "src", "js", "contents.js"),
+    input_detector: path.join(__dirname, "src", "js", "input_detector.js"),
+    notification_ui: path.join(__dirname, "src", "js", "notification_ui.js"),
+    contents_iframe: path.join(__dirname, "src", "js", "contents_iframe.js"),
   },
   output: {
     path: path.join(__dirname, "build"),
@@ -135,6 +136,11 @@ var options = {
       template: path.join(__dirname, "src", "background.html"),
       filename: "background.html",
       chunks: ["background"]
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "src", "notification_ui.html"),
+      filename: "notification_ui.html",
+      chunks: ["notification_ui"]
     }),
     new WriteFilePlugin()
   ]

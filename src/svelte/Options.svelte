@@ -19,7 +19,8 @@
   import { allPlugins } from "../js/plugins";
 
   let tabs = ["Options", "Supported commands"];
-  let activeTab = tabs[0];
+  const tabIndex = new URL(window.location).searchParams.get('tab') || 0;
+  let activeTab = tabs[tabIndex];
   let customHotword = "";
 
   let voiceOption = {
