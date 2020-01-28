@@ -137,6 +137,7 @@
     var commandText;
     let bestMatchCommand = null;
     let bestCommandText;
+    let bestCommandParameters;
     // go over each of the 5 results and alternative results received (we've set maxAlternatives to 5 above)
     for (let i = 0; i < results.length; i++) {
       // the text recognized
@@ -163,13 +164,15 @@
           if (!bestMatchCommand || currentCommand.priority > bestMatchCommand.priority) {
             bestMatchCommand = currentCommand;
             bestCommandText = commandText;
+            bestCommandParameters = parameters;
           }
         }
       }
     }
     if (bestMatchCommand) {
+      console.log(bestMatchCommand);
       // execute the matched command
-      bestMatchCommand.callback.apply(this, parameters);
+      bestMatchCommand.callback.apply(this, bestCommandParameters);
       invokeCallbacks(
         callbacks.resultMatch,
         bestCommandText,

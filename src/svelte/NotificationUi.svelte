@@ -2,7 +2,7 @@
   import { scale } from "svelte/transition";
   import { elasticOut } from "svelte/easing";
   import Card, { Content } from "@smui/card";
-  import delay from "delay";
+
   let disableVoiceDictation = true;
   let lastRequest;
   let showAllCommandsButton = true;
@@ -24,9 +24,7 @@
     });
   });
 
-  chrome.runtime.onMessage.addListener(async request => {
-    showAllCommandsButton = false;
-    showSendFeedbackButton = false;
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     switch (request.type) {
       case "START_LISTENING":
       case "PENDING_RESULT":
@@ -34,31 +32,27 @@
         showAllCommandsButton = true;
         showSendFeedbackButton = true;
         lastRequest = request;
-        delay(5000).then(() => {
-          if (lastRequest === request) {
-            lastRequest = null;
-          }
-        });
         break;
       case "INFO_NOTIFICATION":
+        showAllCommandsButton = false;
+        showSendFeedbackButton = false;
         lastRequest = request;
-        await delay(50000);
-        if (lastRequest === request) {
-          lastRequest = null;
-        }
         break;
       case "CLEAR_NOTIFICATION":
         lastRequest = null;
+        break;
+      case "CHECK_NOTIFICATION":
+        sendResponse({ hasNotification: lastRequest !== null });
         break;
     }
   });
 
   function close() {
-    chrome.runtime.sendMessage({ type: "STOP_TEXT_INPUT" });
+    lastRequest = null;
+    chrome.runtime.sendMessage({ type: "CLEAR_NOTIFICATION" });
   }
 
   function seeAllCommands() {
-    console.log("all commands button");
     chrome.runtime.sendMessage({
       type: "OPEN_URL",
       url: chrome.runtime.getURL("/options.html?tab=1")

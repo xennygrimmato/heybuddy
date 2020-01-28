@@ -19,7 +19,7 @@
   import { allPlugins } from "../js/plugins";
 
   let tabs = ["Options", "Supported commands"];
-  const tabIndex = new URL(window.location).searchParams.get('tab') || 0;
+  const tabIndex = new URL(window.location).searchParams.get("tab") || 0;
   let activeTab = tabs[tabIndex];
   let customHotword = "";
 
@@ -42,7 +42,7 @@
     caption:
       'Chrome Voice Assistant will listen to "Hey buddy" command in the background.',
     errorCaption:
-      "Hotword detection is not enabled. Click here to allow Hey Buddy to listen " +
+      "Hotword detection is not enabled. Click here to allow Chrome Voice Assistant to listen " +
       "to hotword in the background",
     onClick: enabled => {
       storage.set({ hotword: enabled });
@@ -104,7 +104,7 @@
   storage.get(
     ["customHotword", "hotword", "disableInfoPrompt", "disableVoiceDictation"],
     result => {
-      customHotword = result.customHotword;
+      customHotword = result.customHotword || "";
       hotword.enabled = result.hotword;
       notifications.enabled = !result.disableInfoPrompt;
       voiceDictation.enabled = !result.disableVoiceDictation;
@@ -114,9 +114,11 @@
   navigator.mediaDevices
     .getUserMedia({ audio: true })
     .then(stream => {
+      console.log("Voice option enabled");
       voiceOption.enabled = true;
     })
     .catch(error => {
+      console.log("Voice option disabled");
       voiceOption.enabled = false;
     });
 
@@ -138,6 +140,10 @@
     float: right;
   }
 
+  .logo {
+    vertical-align: middle;
+  }
+
   .flex-container {
     display: flex;
     flex-wrap: wrap;
@@ -145,7 +151,8 @@
 </style>
 
 <div class="main-content">
-  <h1 class="mdc-typography--headline5">
+  <h1 class="mdc-typography--headline6">
+    <img class="logo" src="img/icon_128.png" height="32" alt="Logo" />
     Chrome Voice Assistant
     <Button
       class="reviews-button"

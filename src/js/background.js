@@ -30,7 +30,6 @@ class Commander {
         this.requestPermissions(this.lastRequestedPermissions_, () => {});
       },
       onNotificationClosed: () => {
-        this.clearTimer();
         this.startListeningToTriggerCommands();
       }
     });
@@ -44,8 +43,6 @@ class Commander {
     /** ------- Connection with popup window / content script ------- */
     chrome.runtime.onConnect.addListener(port => {
       if (port.name == "chrome-voice-assistant-popup") {
-        this.clearTimer();
-        this.notificationManager_.clearMessage();
         this.popupPort_ = port;
         this.startListeningToAllCommands();
         annyang.start();
@@ -58,7 +55,10 @@ class Commander {
       }
     });
 
-    chrome.runtime.onMessage.addListener((request, sender) => {
+    chrome.runtime.onMessage.addListener(async (request, sender) => {
+      if (DEBUG) {
+        console.log(`Received message: `, request);
+      }
       switch (request.type) {
         case "OPEN_URL":
           chrome.tabs.create({
@@ -66,16 +66,16 @@ class Commander {
           });
           break;
         case "START_TEXT_INPUT":
-          this.startListeningToTextInput();
-          this.notificationManager_.showMessage({
+          await this.startListeningToTextInput();
+          this.notificationManager_.sendMessage({
             type: "START_LISTENING",
-            title: "Listening",
-            content: "Voice input mode started"
+            title: "Voice input mode",
+            content: "Ready to transcribe your speech"
           });
           break;
         case "STOP_TEXT_INPUT":
-          this.notificationManager_.clearMessage();
-          this.startListeningToTriggerCommands();
+          await this.startListeningToTriggerCommands();
+          this.startListeningToAllCommands();
           break;
         case "QUERY":
           annyang.trigger(request.query);
@@ -86,11 +86,11 @@ class Commander {
               if (result.disableInfoPrompt) {
                 return;
               }
-              this.notificationManager_.showInfoMessage(
-                `Microphone may not work on ${getHost(
-                  sender.url
-                )} because hotword detection is enabled.`
-              );
+              // this.notificationManager_.showInfoMessage(
+              //   `Microphone may not work on ${getHost(
+              //     sender.url
+              //   )} because hotword detection is enabled.`
+              // );
             });
           }
           break;
@@ -128,15 +128,27 @@ class Commander {
     });
 
     // Send the result to the popup.
-    annyang.addCallback("resultMatch", userSaid => {
+    annyang.addCallback("resultMatch", async userSaid => {
+      if (DEBUG) {
+        console.log(`ResultMatch: ${userSaid}`);
+      }
       this.sendResultMessage(userSaid);
       this.lastCommand_ = userSaid;
+      await this.startListeningToTriggerCommands();
+      this.startListeningToAllCommands();
     });
 
     annyang.addCallback("result", results => {
       const result = results[0];
-      if (result) {
-        this.sendMessage({ type: "PENDING_RESULT", title: "Listening", content: result });
+      if (
+        result &&
+        (this.popupPort_ || this.notificationManager_.hasMessage())
+      ) {
+        this.notificationManager_.sendMessage({
+          type: "PENDING_RESULT",
+          title: "Listening",
+          content: result
+        });
       }
     });
 
@@ -151,15 +163,10 @@ class Commander {
     }
   }
 
-  clearTimer() {
-    if (this.timer_) {
-      clearTimeout(this.timer_);
-      this.timer_ = undefined;
-    }
-  }
-
-  startListeningToTextInput() {
-    this.startListeningToTriggerCommands();
+  async startListeningToTextInput() {
+    await this.startListeningToTriggerCommands({
+      abortIfHotwordDisabled: false
+    });
     this.startListeningToAllCommands();
     this.textInputManager_.addTextInputCommands();
     if (!annyang.isListening()) {
@@ -176,22 +183,25 @@ class Commander {
     }
   }
 
-  startListeningToTriggerCommands() {
-    this.initTriggerCommands_().then(() => {
-      this.initRegularCommands_();
-      annyang.removeCommands();
-      for (const key in this.triggerCommands_) {
-        annyang.addCommands(
-          { [key]: this.triggerCommands_[key] },
-          this.commandPriorities_[key]
-        );
-      }
-      for (const key in this.commandsWithTrigger_) {
-        annyang.addCommands(
-          { [key]: this.commandsWithTrigger_[key] },
-          this.commandPriorities_[key]
-        );
-      }
+  async startListeningToTriggerCommands({
+    abortIfHotwordDisabled = true
+  } = {}) {
+    await this.initTriggerCommands_();
+    this.initRegularCommands_();
+    annyang.removeCommands();
+    for (const key in this.triggerCommands_) {
+      annyang.addCommands(
+        { [key]: this.triggerCommands_[key] },
+        this.commandPriorities_[key]
+      );
+    }
+    for (const key in this.commandsWithTrigger_) {
+      annyang.addCommands(
+        { [key]: this.commandsWithTrigger_[key] },
+        this.commandPriorities_[key]
+      );
+    }
+    if (abortIfHotwordDisabled) {
       storage.get(["hotword"], result => {
         if (!result.hotword) {
           if (annyang.isListening()) {
@@ -199,19 +209,21 @@ class Commander {
           }
         }
       });
-    });
-  }
-
-  sendMessage(messsage) {
-    this.notificationManager_.showMessage(messsage);
+    }
   }
 
   sendResultMessage(userSaid) {
-    this.sendMessage({ type: "RESULT", title: "Listening", content: userSaid });
+    if (this.popupPort_ || this.notificationManager_.hasMessage()) {
+      this.notificationManager_.sendMessage({
+        type: "RESULT",
+        title: "Received command",
+        content: userSaid
+      });
+    }
   }
 
   /** ------- Helper functions to perform actions ------- */
-  performAction(action) {
+  async performAction(action) {
     if (this.popupPort_ || this.notificationManager_.hasMessage()) {
       action();
     }
@@ -287,7 +299,7 @@ class Commander {
       //   });
       //   return;
       // }
-      this.notificationManager_.showMessage({
+      this.notificationManager_.sendMessage({
         type: "START_LISTENING",
         title: "Listening",
         content: "Hi, how can I help you?"
@@ -349,7 +361,6 @@ class Commander {
 
     /** ------- Termination commands ------- */
     this.addCommands(["bye", "bye bye", "goodbye", "good bye", "close"], () => {
-      this.sendMessage({ type: "CLOSE" });
       this.notificationManager_.clearMessage();
     });
 

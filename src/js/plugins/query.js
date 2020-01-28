@@ -170,7 +170,7 @@ plugins.push({
 plugins.push({
   name: "Video",
   icon: mdiVideo,
-  queries: ["video", "video of cats"],
+  queries: ["video", "video of cats", "watch baby shark"],
   addCommandHandler: commander => {
     commander.addCommands(
       ["play video", "video", "play videos", "videos"],
@@ -188,7 +188,8 @@ plugins.push({
         "video *query",
         "videos of *query",
         "videos about *query",
-        "videos *query"
+        "videos *query",
+        "watch *query",
       ]),
       query => {
         commander.performActionWithDelay(() => {

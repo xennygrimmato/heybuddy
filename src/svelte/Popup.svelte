@@ -17,11 +17,10 @@
 
   const MAX_SUGGESTIONS = 6;
   let disableCache = false;
-  let personalizedSearch = true;
   let activeIndex = -1;
   let query = "";
   let placeholder = "Hi, how can I help you?";
-  let suggestionsPromise;
+  let suggestionsPromise = suggestSearch(query);
 
   chrome.runtime.onMessage.addListener(request => {
     switch (request.type) {
@@ -32,23 +31,20 @@
         query = "";
         placeholder = request.content;
         break;
-      case "CLOSE":
+      case "CLEAR_NOTIFICATION":
         window.close();
         break;
     }
   });
 
   async function suggestSearch(val) {
-    if (!val) {
-      return [];
-    }
     const url =
       "https://www.google.com/complete/search?xssi=t&client=psy-ab&psi=&q=" +
       encodeURIComponent(val);
     const result = await fetch(url, {
       mode: "cors",
       cache: disableCache ? "no-cache" : "default",
-      credentials: personalizedSearch ? "include" : "omit"
+      credentials: "include"
     });
     const responseText = await result.text();
     const jsonResult = JSON.parse(responseText.replace(")]}'", ""));
@@ -71,17 +67,18 @@
     }
     let outputList = [];
     for (let item of results) {
+      let deleteCallback;
+      if (item.deletionToken) {
+        deleteCallback = () =>
+          fetch(item.deletionToken, {
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "include"
+          });
+      }
       outputList.push({
         query: item.query,
-        deleteCallback: item.deletionToken
-          ? () => {
-              return fetch(item.deletionToken, {
-                mode: "cors",
-                cache: "no-cache",
-                credentials: "include"
-              });
-            }
-          : undefined,
+        deleteCallback,
         type: item.deletionToken ? "history" : "search"
       });
     }
@@ -94,7 +91,7 @@
   }
 
   function processUserSaid(q) {
-    query = '';
+    query = "";
     placeholder = q;
   }
 
@@ -121,7 +118,7 @@
         }
         activeIndex = activeIndex - 1;
         break;
-      case 13:  // ENTER key
+      case 13: // ENTER key
         if (activeIndex > -1 && suggestions[activeIndex]) {
           /* and simulate a click on the "active" item: */
           processQuery(suggestions[activeIndex].query);
@@ -148,6 +145,10 @@
 
   .main {
     text-align: center;
+  }
+
+  .logo {
+    text-align: left;
   }
 
   .results {
@@ -214,7 +215,7 @@
 </style>
 
 <div class="main">
-  <img src="img/baseline-mic-24px.svg" alt="Logo" />
+  <img class="logo" src="img/icon_128.png" height="48" alt="Logo" />
   <a
     class="reviews"
     href="https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem"
@@ -226,7 +227,7 @@
       class="results"
       autofocus
       autocomplete="off"
-      placeholder={placeholder}
+      {placeholder}
       on:keydown={onKeyDown}
       bind:value={query} />
 
@@ -258,14 +259,6 @@
     {/if}
 
     <div class="hint">
-      <input
-        type="checkbox"
-        id="personalized-search"
-        bind:checked={personalizedSearch} />
-      <label for="personalized-search">
-        Show personalized search suggestions
-      </label>
-      &middot;
       <a href="/options.html" target="_blank">See all supported commands</a>
       .
     </div>
