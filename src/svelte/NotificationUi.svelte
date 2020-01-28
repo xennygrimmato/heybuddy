@@ -6,6 +6,7 @@
   let disableVoiceDictation = true;
   let lastRequest;
   let showAllCommandsButton = true;
+  let showGrantPermissionButton = true;
   let showSendFeedbackButton = true;
 
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -14,12 +15,12 @@
       case "PENDING_RESULT":
       case "RESULT":
         showAllCommandsButton = true;
-        showSendFeedbackButton = true;
+        showGrantPermissionButton = false;
         lastRequest = request;
         break;
       case "PERMISSION_REQUEST":
         showAllCommandsButton = false;
-        showSendFeedbackButton = false;
+        showGrantPermissionButton = true;
         lastRequest = request;
         break;
       case "CLEAR_NOTIFICATION":
@@ -49,6 +50,22 @@
       url:
         "https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem"
     });
+  }
+
+  function reviewPermission() {
+    chrome.permissions.request(
+      {
+        permissions: lastRequest.permissions
+      },
+      granted => {
+        if (granted) {
+          chrome.runtime.sendMessage({
+            type: "QUERY",
+            query: lastRequest.originalMessage
+          });
+        }
+      }
+    );
   }
 
   chrome.runtime.sendMessage({
@@ -91,6 +108,12 @@
 
   .chrome-voice-assistant-logo {
     height: 28px;
+    vertical-align: middle;
+  }
+
+  .chrome-voice-assistant-icon {
+    height: 20px;
+    width: 20px;
     vertical-align: middle;
   }
 
@@ -149,9 +172,7 @@
         <div class="chrome-voice-assistant-button" on:click={seeAllCommands}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            class="chrome-voice-assistant-logo"
+            class="chrome-voice-assistant-icon"
             viewBox="0 0 20 20">
             <path fill="none" d="M0 0h20v20H0V0z" />
             <path
@@ -171,13 +192,27 @@
           See supported commands
         </div>
       {/if}
+      {#if showGrantPermissionButton}
+        <div class="chrome-voice-assistant-button" on:click={reviewPermission}>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="chrome-voice-assistant-icon"
+            viewBox="0 0 24 24">
+            <path clip-rule="evenodd" fill="none" d="M0 0h24v24H0z" />
+            <path
+              d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9
+              1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1
+              9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z" />
+          </svg>
+          Review permission
+        </div>
+      {/if}
+
       {#if showSendFeedbackButton}
         <div class="chrome-voice-assistant-button" on:click={sendFeedback}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            class="chrome-voice-assistant-logo"
+            class="chrome-voice-assistant-icon"
             viewBox="0 0 24 24">
             <path d="M0 0h24v24H0z" fill="none" />
             <path

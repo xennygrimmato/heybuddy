@@ -24,19 +24,11 @@ class Commander {
       }
     }
 
-    this.notificationManager_ = new NotificationManager({
-      onRequestPermission: () => {
-        this.requestPermissions(this.lastRequestedPermissions_, () => {});
-      },
-      onNotificationClosed: () => {
-        this.startListeningToTriggerCommands();
-      }
-    });
+    this.notificationManager_ = new NotificationManager();
     this.allPlugins_ = allPlugins;
     this.textInputManager_ = new TextInputManager(this);
     this.lastCommand_ = "";
     this.popupPort_ = undefined;
-    this.lastRequestedPermissions_ = undefined;
     this.enableHotwords_ = false;
     this.commandPriorities_ = {};
 
@@ -245,8 +237,7 @@ class Commander {
     }, 100);
   }
 
-  requestPermissions(permissions, callback) {
-    this.lastRequestedPermissions_ = permissions;
+  requestPermissions(permissions, originalMessage, requestPermissionMessage, callback) {
     chrome.permissions.request(
       {
         permissions: permissions
@@ -258,8 +249,9 @@ class Commander {
           this.notificationManager_.sendMessage({
             type: "PERMISSION_REQUEST",
             title: "Permission needed",
-            content:
-              "Hey Buddy - Chrome Voice Assistant needs permission to read your bookmarks."
+            content: requestPermissionMessage,
+            originalMessage,
+            permissions,
           });
         }
       }

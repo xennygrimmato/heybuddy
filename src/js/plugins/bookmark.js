@@ -23,7 +23,12 @@ const plugins = [
             });
           };
           if (!chrome.bookmarks) {
-            commander.requestPermissions(["bookmarks"], bookmarkHandler);
+            commander.requestPermissions(
+              ["bookmarks"],
+              "bookmark",
+              "Hey Buddy needs permission to manage your bookmarks.",
+              bookmarkHandler
+            );
           } else {
             bookmarkHandler();
           }
@@ -51,7 +56,12 @@ const plugins = [
             });
           };
           if (!chrome.bookmarks) {
-            commander.requestPermissions(["bookmarks"], unbookmarkHandler);
+            commander.requestPermissions(
+              ["bookmarks"],
+              "remove bookmark",
+              "Hey Buddy needs permission to manage your bookmarks.",
+              unbookmarkHandler
+            );
           } else {
             unbookmarkHandler();
           }

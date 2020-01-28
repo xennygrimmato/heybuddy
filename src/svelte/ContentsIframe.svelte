@@ -10,7 +10,9 @@
         showIframe = true;
         break;
       case "CLEAR_NOTIFICATION":
-        showIframe = false;
+        setTimeout(() => {
+          showIframe = false;
+        }, 500);
         break;
     }
   });
