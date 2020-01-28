@@ -12,6 +12,7 @@
   import Tab, { Icon, Label as TabLabel } from "@smui/tab";
   import TabBar from "@smui/tab-bar";
   import Button, { Label } from "@smui/button";
+  import { fly } from "svelte/transition";
   import MdiIcon from "./MdiIcon.svelte";
   import OptionCard from "./OptionCard.svelte";
   import OptionPlugin from "./OptionPlugin.svelte";
@@ -39,11 +40,9 @@
   let hotword = {
     icon: mdiMicrophone,
     title: '"Hey buddy" hotword detection',
-    caption:
-      'Chrome Voice Assistant will listen to "Hey buddy" command in the background.',
+    caption: 'We will listen to "Hey buddy" hotword command in the background.',
     errorCaption:
-      "Hotword detection is not enabled. Click here to allow Chrome Voice Assistant to listen " +
-      "to hotword in the background",
+      "Hotword detection is not enabled. Click here to trigger by saying the hotword",
     onClick: enabled => {
       storage.set({ hotword: enabled });
     }
@@ -129,7 +128,7 @@
   :global(.main-content) {
     margin: auto;
     padding: 5px;
-    width: 50%;
+    width: 600px;
   }
 
   :global(.hotword-input) {
@@ -137,7 +136,13 @@
   }
 
   :global(.reviews-button) {
-    float: right;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+  }
+
+  :global(.logo-text) {
+    font-size: 1.5em;
   }
 
   .logo {
@@ -148,19 +153,27 @@
     display: flex;
     flex-wrap: wrap;
   }
+
+  .transition-container {
+    position: absolute;
+    width: 600px;
+  }
 </style>
 
 <div class="main-content">
   <h1 class="mdc-typography--headline6">
-    <img class="logo" src="img/icon_128.png" height="32" alt="Logo" />
-    Chrome Voice Assistant
+    <Button href="https://bewisse.com/heybuddy/">
+      <img class="logo" src="img/icon_128.png" height="32" alt="Logo" />
+      &nbsp;
+      <Label class="logo-text">Hey Buddy - Chrome Voice Assistant</Label>
+    </Button>
     <Button
       class="reviews-button"
       href="https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem"
       target="_blank">
       <MdiIcon size="24" icon={mdiComment} color={ICON_COLOR} />
       &nbsp;
-      <Label color={ICON_COLOR}>Review / Send feedbacks</Label>
+      <Label color={ICON_COLOR}>Review & Feedbacks</Label>
     </Button>
   </h1>
 
@@ -170,39 +183,43 @@
     </Tab>
   </TabBar>
   {#if activeTab === tabs[0]}
-    {#if !voiceOption.enabled}
-      <OptionCard option={voiceOption} />
-    {/if}
-    {#if voiceOption.enabled}
-      <OptionCard option={hotword} />
-      <OptionCard option={notifications} />
-    {/if}
-    <OptionCard option={voiceDictation} />
-    <OptionCard option={shortcut} />
-    <Card class="card">
-      <Content>
-        <div class="mdc-typography--subtitle1">Hotwords</div>
-        <div class="mdc-typography--caption">
-          Say one of these hotwords to trigger Chrome Voice Assistant by voice.
-        </div>
-        <Textfield
-          variant="filled"
-          disabled
-          class="hotword-input"
-          value="Hey Buddy (default and cannot be changed)"
-          input$readonly
-          input$aria-readonly />
-        <Textfield
-          variant="outlined"
-          class="hotword-input"
-          input$placeholder="Set custom hotword"
-          bind:value={customHotword}
-          input$minlength="5" />
-      </Content>
-    </Card>
+    <div class="transition-container" transition:fly={{ x: -200 }}>
+      {#if !voiceOption.enabled}
+        <OptionCard option={voiceOption} />
+      {/if}
+      {#if voiceOption.enabled}
+        <OptionCard option={hotword} />
+        <OptionCard option={notifications} />
+      {/if}
+      <OptionCard option={voiceDictation} />
+      <OptionCard option={shortcut} />
+      <Card class="card">
+        <Content>
+          <div class="mdc-typography--subtitle1">Hotwords</div>
+          <div class="mdc-typography--caption">
+            Say one of these hotwords to trigger Hey Buddy by voice.
+          </div>
+          <Textfield
+            variant="filled"
+            disabled
+            class="hotword-input"
+            value="Hey Buddy (default and cannot be changed)"
+            input$readonly
+            input$aria-readonly />
+          <Textfield
+            variant="outlined"
+            class="hotword-input"
+            input$placeholder="Set custom hotword"
+            bind:value={customHotword}
+            input$minlength="5" />
+        </Content>
+      </Card>
+    </div>
   {/if}
   {#if activeTab === tabs[1]}
-    <div class="flex-container">
+    <div
+      class="flex-container transition-container"
+      transition:fly={{ x: 200 }}>
       {#each allPlugins as plugin}
         <OptionPlugin {plugin} />
       {/each}

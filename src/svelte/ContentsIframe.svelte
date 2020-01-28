@@ -36,4 +36,4 @@
   class="chrome-voice-assistant {showIframe ? '' : 'chrome-voice-assistant-hidden'}"
   seamless
   src={url}
-  title="Chrome Voice Assistant" />
+  title="Hey Buddy - Chrome Voice Assistant" />

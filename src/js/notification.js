@@ -1,29 +1,8 @@
-import moment from "moment";
+import { DEBUG } from "./common";
 
 export default class NotificationManager {
-  constructor(options) {
+  constructor() {
     this.lastData_ = undefined;
-    chrome.notifications.onButtonClicked.addListener(
-      (notificationId, buttonIndex) => {
-        if (notificationId == this.infoNotificationId_) {
-          switch (buttonIndex) {
-            case 0:
-              storage.set({ hotword: false });
-              break;
-            case 1:
-              storage.set({ disableInfoPrompt: true });
-              break;
-          }
-        } else if (notificationId == this.permissionNotificationId_) {
-          switch (buttonIndex) {
-            case 0:
-              options.onRequestPermission();
-              break;
-          }
-        }
-        chrome.notifications.clear(notificationId);
-      }
-    );
   }
 
   hasMessage() {
@@ -48,7 +27,9 @@ export default class NotificationManager {
   }
 
   async innerSendMessage(request) {
-    console.log(request);
+    if (DEBUG) {
+      console.log(`Sending request`, request);
+    }
     chrome.runtime.sendMessage(request);
     try {
       const activeTab = await this.getActiveTab();
@@ -73,7 +54,7 @@ export default class NotificationManager {
               return;
             }
           }
-          reject('No active tab found.');
+          reject("No active tab found.");
         }
       );
     });

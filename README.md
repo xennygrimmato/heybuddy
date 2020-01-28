@@ -4,14 +4,14 @@
   Chrome Voice Assistant is a browser extension that allow you to use voice to control  your browser.
 </h3>
 <h3 align="center">
-  <img src="https://bewisse.com/heybuddy/icon-180.png" width="24px" alt="Chrome Voice Assistant" />
+  <img src="https://static.bewisse.com/heybuddy/logo_2x.webp" width="24px" alt="Hey Buddy - Chrome Voice Assistant" />
   <a href="https://bewisse.com/heybuddy/">
     Official Website
   </a>
 </h3>
 <p align="center">
   <a href="https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem">
-    <img src="https://bewisse.com/chrome_1x.png" srcset="https://bewisse.com/chrome_2x.png 2x">
+    <img src="https://static.bewisse.com/chrome_1x.png" srcset="https://static.bewisse.com/chrome_2x.png 2x">
   </a>
 </p>
 
@@ -25,7 +25,7 @@
 
 ## Screenshots
 
-<img src="https://bewisse.com/heybuddy/screenshot1.png">
+<img src="https://static.bewisse.com/heybuddy/screenshot1.webp">
 
 ## Forking and contribution
 

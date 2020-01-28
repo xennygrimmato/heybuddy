@@ -245,9 +245,11 @@ class Commander {
         if (granted) {
           callback();
         } else {
-          this.notificationManager_.showPermissionMessage(
-            "Chrome Voice Assistant needs permission to read your bookmarks."
-          );
+          this.notificationManager_.sendMessage({
+            type: "PERMISSION_REQUEST",
+            title: "Permission needed",
+            content: "Hey Buddy - Chrome Voice Assistant needs permission to read your bookmarks."
+          });
         }
       }
     );

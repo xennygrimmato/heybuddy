@@ -1,11 +1,11 @@
 {
-  "name": "Chrome Voice Assistant",
+  "name": "Hey Buddy - Chrome Voice Assistant",
   "version": "2.0.0",
   "manifest_version": 2,
-  "description": "Use voice commands to control your browser",
+  "description": "Use voice commands to control your Chrome browser",
   "browser_action": {
     "default_icon": "img/icon_128.png",
-    "default_title": "Chrome Voice Assistant",
+    "default_title": "Hey Buddy - Chrome Voice Assistant",
     "default_popup": "popup.html"
   },
   "background": {
@@ -48,7 +48,6 @@
     "<all_urls>",
     "activeTab",
     "contextMenus",
-    "notifications",
     "storage"
   ],
   "web_accessible_resources": [
