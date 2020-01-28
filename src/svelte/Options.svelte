@@ -33,6 +33,7 @@
       "Voice command will not work without microphone access. Please click on the icon " +
       "at the right hand side of the URL bar to grant access.",
     onClick: enabled => {
+      storage.set({ hotword: true });
       location.reload();
     }
   };

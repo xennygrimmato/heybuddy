@@ -2,7 +2,7 @@ var webpack = require("webpack"),
   path = require("path"),
   fileSystem = require("fs"),
   env = require("./utils/env"),
-  CleanWebpackPlugin = require("clean-webpack-plugin"),
+  { CleanWebpackPlugin } = require("clean-webpack-plugin"),
   CopyWebpackPlugin = require("copy-webpack-plugin"),
   HtmlWebpackPlugin = require("html-webpack-plugin"),
   WriteFilePlugin = require("write-file-webpack-plugin"),
@@ -36,7 +36,7 @@ var options = {
     options: path.join(__dirname, "src", "js", "options.js"),
     background: path.join(__dirname, "src", "js", "background.js"),
     notification_ui: path.join(__dirname, "src", "js", "notification_ui.js"),
-    contents_iframe: path.join(__dirname, "src", "js", "contents_iframe.js"),
+    contents_iframe: path.join(__dirname, "src", "js", "contents_iframe.js")
   },
   output: {
     path: path.join(__dirname, "build"),
@@ -96,7 +96,9 @@ var options = {
   },
   plugins: [
     // clean the build folder
-    new CleanWebpackPlugin(["build"]),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: [path.join(__dirname, "build")]
+    }),
     new MiniCssExtractPlugin(),
     // expose and write the allowed env vars on the compiled bundle
     new webpack.DefinePlugin({
