@@ -1,14 +1,19 @@
 import { mdiBookmark } from "@mdi/js";
+import commander from "../commander";
 
 const plugins = [
   {
     name: "Bookmark",
     icon: mdiBookmark,
     queries: ["bookmark", "bookmark (this) page", "remove bookmark"],
-    addCommandHandler: commander => {
-      commander.addCommands(
-        ["bookmark", "bookmark (this) page", "add (this) (page) (to) bookmark"],
-        query => {
+    commands: [
+      {
+        commands: [
+          "bookmark",
+          "bookmark (this) page",
+          "add (this) (page) (to) bookmark"
+        ],
+        callback: query => {
           const bookmarkHandler = () => {
             commander.getActiveTab(activeTab => {
               chrome.bookmarks.create({
@@ -23,15 +28,14 @@ const plugins = [
             bookmarkHandler();
           }
         }
-      );
-
-      commander.addCommands(
-        [
+      },
+      {
+        commands: [
           "remove (from) bookmark",
           "remove this bookmark",
           "remove the bookmark"
         ],
-        query => {
+        callback: query => {
           const unbookmarkHandler = () => {
             commander.getActiveTab(activeTab => {
               chrome.bookmarks.search(
@@ -52,8 +56,8 @@ const plugins = [
             unbookmarkHandler();
           }
         }
-      );
-    }
+      }
+    ]
   }
 ];
 

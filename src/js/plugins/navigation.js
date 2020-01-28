@@ -1,21 +1,28 @@
 import { mdiArrowRight } from "@mdi/js";
+import commander from "../commander";
 
 const plugins = [
   {
     name: "Navigation",
     icon: mdiArrowRight,
     queries: ["go back", "go forward", "reload | refresh"],
-    addCommandHandler: commander => {
-      commander.addCommands(["go back"], query => {
-        commander.executeScripts("window.history.back();");
-      });
+    commands: [
+      {
+        commands: ["go back"],
+        callback: query => {
+          commander.executeScripts("window.history.back();");
+        }
+      },
 
-      commander.addCommands(["go forward"], query => {
-        commander.executeScripts("window.history.forward();");
-      });
+      {
+        commands: ["go forward"],
+        callback: query => {
+          commander.executeScripts("window.history.forward();");
+        }
+      },
 
-      commander.addCommands(
-        [
+      {
+        commands: [
           "reload",
           "reload tab",
           "reload this tab",
@@ -25,11 +32,11 @@ const plugins = [
           "refresh this tab",
           "refresh the tab"
         ],
-        () => {
+        callback: () => {
           chrome.tabs.reload({});
         }
-      );
-    }
+      }
+    ]
   }
 ];
 

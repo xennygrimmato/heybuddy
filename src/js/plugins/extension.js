@@ -4,8 +4,8 @@ const plugins = [
   {
     name: "Voice assistant",
     icon: mdiMicrophone,
-    queries: ["bye | good bye", "close"],
-    addCommandHandler: commander => {}
+    queries: ["bye", "good bye", "close"],
+    commands: [],
   }
 ];
 

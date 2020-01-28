@@ -1,4 +1,23 @@
 import { mdiPlayCircleOutline } from "@mdi/js";
+import commander from "../commander";
+
+function forAllVideos(perVideoCommand) {
+  return (
+    "const videos = document.getElementsByTagName('video');\nfor (let video of videos" +
+    ") { " +
+    perVideoCommand +
+    " }\n"
+  );
+}
+
+function forAllAudios(perAudioCommand) {
+  return (
+    "const audios = document.getElementsByTagName('audio');\nfor (let audio of audios" +
+    ") { " +
+    perAudioCommand +
+    " }\n"
+  );
+}
 
 const plugins = [
   {
@@ -12,74 +31,78 @@ const plugins = [
       "go back to the beginning",
       "go to the end"
     ],
-    addCommandHandler: commander => {
-      const forAllVideos = perVideoCommand => {
-        return (
-          "const videos = document.getElementsByTagName('video');\nfor (let video of videos" +
-          ") { " +
-          perVideoCommand +
-          " }\n"
-        );
-      };
+    commands: [
+      {
+        commands: ["pause", "stop"],
+        callback: query => {
+          commander.executeScripts(
+            forAllVideos("video.pause();") + forAllAudios("audio.pause();")
+          );
+        }
+      },
 
-      const forAllAudios = perAudioCommand => {
-        return (
-          "const audios = document.getElementsByTagName('audio');\nfor (let audio of audios" +
-          ") { " +
-          perAudioCommand +
-          " }\n"
-        );
-      };
+      {
+        commands: ["play", "resume"],
+        callback: query => {
+          commander.executeScripts(
+            forAllVideos("video.play();") + forAllAudios("audio.play();")
+          );
+        }
+      },
 
-      commander.addCommands(["pause", "stop"], query => {
-        commander.executeScripts(
-          forAllVideos("video.pause();") + forAllAudios("audio.pause();")
-        );
-      });
+      {
+        commands: ["increase volume", "volume up"],
+        callback: query => {
+          commander.executeScripts(
+            forAllVideos("video.volume = Math.min(1, video.volume + .2);") +
+              forAllAudios("audio.volume = Math.min(1, audio.volume + .2);")
+          );
+        }
+      },
 
-      commander.addCommands(["play", "resume"], query => {
-        commander.executeScripts(
-          forAllVideos("video.play();") + forAllAudios("audio.play();")
-        );
-      });
+      {
+        commands: ["decrease volume", "volume down"],
+        callback: query => {
+          commander.executeScripts(
+            forAllVideos("video.volume = Math.max(0, video.volume - .2);") +
+              forAllAudios("audio.volume = Math.max(0, audio.volume - .2);")
+          );
+        }
+      },
 
-      commander.addCommands(["increase volume", "volume up"], query => {
-        commander.executeScripts(
-          forAllVideos("video.volume = Math.min(1, video.volume + .2);") +
-            forAllAudios("audio.volume = Math.min(1, audio.volume + .2);")
-        );
-      });
+      {
+        commands: ["(make it) loud"],
+        callback: query => {
+          commander.executeScripts(
+            forAllVideos("video.volume = .8;") +
+              forAllAudios("audio.volume = .8;")
+          );
+        }
+      },
 
-      commander.addCommands(["decrease volume", "volume down"], query => {
-        commander.executeScripts(
-          forAllVideos("video.volume = Math.max(0, video.volume - .2);") +
-            forAllAudios("audio.volume = Math.max(0, audio.volume - .2);")
-        );
-      });
+      {
+        commands: ["(make it) very loud"],
+        callback: query => {
+          commander.executeScripts(
+            forAllVideos("video.volume = 1;") +
+              forAllAudios("audio.volume = 1;")
+          );
+        }
+      },
 
-      commander.addCommands(["(make it) loud"], query => {
-        commander.executeScripts(
-          forAllVideos("video.volume = .8;") +
-            forAllAudios("audio.volume = .8;")
-        );
-      });
+      {
+        commands: ["(make it) quiet"],
+        callback: query => {
+          commander.executeScripts(
+            forAllVideos("video.volume = .2;") +
+              forAllAudios("audio.volume = .2;")
+          );
+        }
+      },
 
-      commander.addCommands(["(make it) very loud"], query => {
-        commander.executeScripts(
-          forAllVideos("video.volume = 1;") + forAllAudios("audio.volume = 1;")
-        );
-      });
-
-      commander.addCommands(["(make it) quiet"], query => {
-        commander.executeScripts(
-          forAllVideos("video.volume = .2;") +
-            forAllAudios("audio.volume = .2;")
-        );
-      });
-
-      commander.addCommands(
-        ["skip *query seconds", "(go) forward *query seconds"],
-        query => {
+      {
+        commands: ["skip *query seconds", "(go) forward *query seconds"],
+        callback: query => {
           let seconds = parseFloat(query);
           if (!(seconds > 0)) {
             seconds = 10;
@@ -89,22 +112,25 @@ const plugins = [
               forAllAudios("audio.currentTime += " + seconds + ";")
           );
         }
-      );
+      },
 
-      commander.addCommands(["(go) back *query seconds"], query => {
-        let seconds = parseFloat(query);
-        if (!(seconds > 0)) {
-          seconds = 10;
+      {
+        commands: ["(go) back *query seconds"],
+        callback: query => {
+          let seconds = parseFloat(query);
+          if (!(seconds > 0)) {
+            seconds = 10;
+          }
+          commander.executeScripts(
+            forAllVideos("video.currentTime -= " + seconds + ";") +
+              forAllAudios("audio.currentTime -= " + seconds + ";")
+          );
         }
-        commander.executeScripts(
-          forAllVideos("video.currentTime -= " + seconds + ";") +
-            forAllAudios("audio.currentTime -= " + seconds + ";")
-        );
-      });
+      },
 
-      commander.addCommands(
-        ["skip *query minutes", "(go) forward *query minutes"],
-        query => {
+      {
+        commands: ["skip *query minutes", "(go) forward *query minutes"],
+        callback: query => {
           let minutes = parseFloat(query);
           if (!(minutes > 0)) {
             minutes = 1;
@@ -115,22 +141,25 @@ const plugins = [
               forAllAudios("audio.currentTime += " + seconds + ";")
           );
         }
-      );
+      },
 
-      commander.addCommands(["(go) back *query minutes"], query => {
-        let minutes = parseFloat(query);
-        if (!(minutes > 0)) {
-          minutes = 1;
+      {
+        commands: ["(go) back *query minutes"],
+        callback: query => {
+          let minutes = parseFloat(query);
+          if (!(minutes > 0)) {
+            minutes = 1;
+          }
+          let seconds = minutes * 60;
+          commander.executeScripts(
+            forAllVideos("video.currentTime -= " + seconds + ";") +
+              forAllAudios("audio.currentTime -= " + seconds + ";")
+          );
         }
-        let seconds = minutes * 60;
-        commander.executeScripts(
-          forAllVideos("video.currentTime -= " + seconds + ";") +
-            forAllAudios("audio.currentTime -= " + seconds + ";")
-        );
-      });
+      },
 
-      commander.addCommands(
-        [
+      {
+        commands: [
           "skip 1 minute",
           "(go) forward 1 minute",
           "skip one minute",
@@ -138,40 +167,50 @@ const plugins = [
           "skip a minute",
           "(go) forward a minute"
         ],
-        query => {
+        callback: query => {
           let seconds = 60;
           commander.executeScripts(
             forAllVideos("video.currentTime += " + seconds + ";") +
               forAllAudios("audio.currentTime += " + seconds + ";")
           );
         }
-      );
+      },
 
-      commander.addCommands(
-        ["(go) back 1 minute", "(go) back one minute", "(go) back a minute"],
-        query => {
+      {
+        commands: [
+          "(go) back 1 minute",
+          "(go) back one minute",
+          "(go) back a minute"
+        ],
+        callback: query => {
           let seconds = 60;
           commander.executeScripts(
             forAllVideos("video.currentTime -= " + seconds + ";") +
               forAllAudios("audio.currentTime -= " + seconds + ";")
           );
         }
-      );
+      },
 
-      commander.addCommands(["(go) back to (the) beginning"], query => {
-        commander.executeScripts(
-          forAllVideos("video.currentTime = 0;") +
-            forAllAudios("audio.currentTime = 0;")
-        );
-      });
+      {
+        commands: ["(go) back to (the) beginning"],
+        callback: query => {
+          commander.executeScripts(
+            forAllVideos("video.currentTime = 0;") +
+              forAllAudios("audio.currentTime = 0;")
+          );
+        }
+      },
 
-      commander.addCommands(["(go) to (the) end"], query => {
-        commander.executeScripts(
-          forAllVideos("video.currentTime = video.duration;") +
-            forAllAudios("audio.currentTime = audio.duration;")
-        );
-      });
-    }
+      {
+        commands: ["(go) to (the) end"],
+        callback: query => {
+          commander.executeScripts(
+            forAllVideos("video.currentTime = video.duration;") +
+              forAllAudios("audio.currentTime = audio.duration;")
+          );
+        }
+      }
+    ]
   }
 ];
 

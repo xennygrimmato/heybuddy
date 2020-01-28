@@ -10,6 +10,7 @@ import {
   mdiPencil,
   mdiMagnify
 } from "@mdi/js";
+import commander from "../commander";
 
 /** ------- Search query ------- */
 const prependQueryPhrase = queries => {
@@ -32,9 +33,9 @@ plugins.push({
     "pictures of puppies",
     "photos of Tailor Swift"
   ],
-  addCommandHandler: commander => {
-    commander.addCommands(
-      prependQueryPhrase([
+  commands: [
+    {
+      commands: prependQueryPhrase([
         "image of *query",
         "photo of *query",
         "picture of *query",
@@ -42,42 +43,46 @@ plugins.push({
         "photos of *query",
         "pictures of *query"
       ]),
-      query => {
+      callback: query => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl(
             "https://www.google.com/search?tbm=isch&q=" + query
           );
         });
       }
-    );
-  }
+    }
+  ]
 });
 
 plugins.push({
   name: "News",
   icon: mdiNewspaper,
   queries: ["news of Google", "news about technology", "news | today's news"],
-  addCommandHandler: commander => {
-    commander.addCommands(
-      prependQueryPhrase(["news of *query", "news about *query"]),
-      query => {
+  commands: [
+    {
+      commands: prependQueryPhrase(["news of *query", "news about *query"]),
+      callback: query => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl(
             "https://www.google.com/search?tbm=nws&q=" + query
           );
         });
       }
-    );
-
-    commander.addCommands(
-      prependQueryPhrase(["news", "news today", "today news", "today's news"]),
-      () => {
+    },
+    {
+      commands: prependQueryPhrase([
+        "news",
+        "news today",
+        "today news",
+        "today's news"
+      ]),
+      callback: () => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl("https://news.google.com/");
         });
       }
-    );
-  }
+    }
+  ]
 });
 
 plugins.push({
@@ -88,200 +93,263 @@ plugins.push({
     "direction to Las Vegas",
     "direction from home to work"
   ],
-  addCommandHandler: commander => {
-    commander.addCommands(
-      prependQueryPhrase([
+  commands: [
+    {
+      commands: prependQueryPhrase([
         "map of *query",
         "map to *query",
         "how to get to *query",
         "how do I get to *query"
       ]),
-      query => {
+      callback: query => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl("https://www.google.com/maps?q=" + query);
         });
       }
-    );
+    },
 
-    commander.addCommands(
-      prependQueryPhrase([
+    {
+      commands: prependQueryPhrase([
         "direction from *from to *to",
         "directions from *from to *to"
       ]),
-      (from, to) => {
+      callback: (from, to) => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl(
             "https://www.google.com/maps/dir/" + from + "/" + to
           );
         });
       }
-    );
+    },
 
-    commander.addCommands(
-      prependQueryPhrase(["direction from *query", "directions from *query"]),
-      query => {
+    {
+      commands: prependQueryPhrase([
+        "direction from *query",
+        "directions from *query"
+      ]),
+      callback: query => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl("https://www.google.com/maps/dir/" + query);
         });
       }
-    );
+    },
 
-    commander.addCommands(
-      prependQueryPhrase(["direction to *query", "directions to *query"]),
-      query => {
+    {
+      commands: prependQueryPhrase([
+        "direction to *query",
+        "directions to *query"
+      ]),
+      callback: query => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl("https://www.google.com/maps/dir//" + query);
         });
       }
-    );
-  }
+    }
+  ]
 });
 
 plugins.push({
   name: "Wikipedia",
   icon: mdiWikipedia,
   queries: ["about California", "wiki about the Universe", "wikipedia"],
-  addCommandHandler: commander => {
-    commander.addCommands(["wikipedia"], () => {
-      commander.performActionWithDelay(() => {
-        commander.openTabWithUrl("https://wikipedia.org/");
-      });
-    });
-
-    commander.addCommands(
-      [
+  commands: [
+    {
+      commands: ["wikipedia"],
+      callback: () => {
+        commander.performActionWithDelay(() => {
+          commander.openTabWithUrl("https://wikipedia.org/");
+        });
+      }
+    },
+    {
+      commands: [
         "about *query",
         "wiki about *query",
         "wiki *query",
         "wikipedia about *query",
         "wikipedia *query"
       ],
-      query => {
+      callback: query => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl(
             "https://en.wikipedia.org/wiki/Special:Search/" + query
           );
         });
       }
-    );
-  }
+    }
+  ]
 });
 
 plugins.push({
   name: "Video",
   icon: mdiVideo,
   queries: ["video", "video of cats", "watch baby shark"],
-  addCommandHandler: commander => {
-    commander.addCommands(
-      ["play video", "video", "play videos", "videos"],
-      () => {
+  commands: [
+    {
+      commands: ["play video", "video", "play videos", "videos"],
+      callback: () => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl("https://www.youtube.com/");
         });
       }
-    );
-
-    commander.addCommands(
-      prependQueryPhrase([
+    },
+    {
+      commands: prependQueryPhrase([
         "video of *query",
         "video about *query",
         "video *query",
         "videos of *query",
         "videos about *query",
         "videos *query",
-        "watch *query",
+        "watch *query"
       ]),
-      query => {
+      callback: query => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl(
             "https://www.youtube.com/results?search_query=" + query
           );
         });
       }
-    );
-  }
+    }
+  ]
 });
 
 plugins.push({
   name: "Music",
   icon: mdiMusic,
   queries: ["music", "play music"],
-  addCommandHandler: commander => {
-    commander.addCommands(["play music", "music"], () => {
-      commander.performActionWithDelay(() => {
-        commander.openTabWithUrl("https://play.google.com/music/listen");
-      });
-    });
-  }
+  commands: [
+    {
+      commands: ["play music", "music"],
+      callback: () => {
+        commander.performActionWithDelay(() => {
+          commander.openTabWithUrl("https://play.google.com/music/listen");
+        });
+      }
+    }
+  ]
 });
 
 plugins.push({
   name: "Shopping",
   icon: mdiShopping,
   queries: ["shopping | buy something", "shop for paper towel"],
-  addCommandHandler: commander => {
-    commander.addCommands(["shopping", "buy something"], () => {
-      commander.performActionWithDelay(() => {
-        commander.openTabWithUrl("https://www.amazon.com/");
-      });
-    });
-
-    commander.addCommands(
-      ["shop for a *query", "shop for *query", "buy a *query", "buy *query"],
-      query => {
+  commands: [
+    {
+      commands: ["shopping", "buy something"],
+      callback: () => {
+        commander.performActionWithDelay(() => {
+          commander.openTabWithUrl("https://www.amazon.com/");
+        });
+      }
+    },
+    {
+      commands: [
+        "shop for a *query",
+        "shop for *query",
+        "buy a *query",
+        "buy *query"
+      ],
+      callback: query => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl(
             "https://www.amazon.com/s/field-keywords=" + query
           );
         });
       }
-    );
-  }
+    }
+  ]
 });
 
 plugins.push({
   name: "Quick links",
   icon: mdiStar,
   queries: ["go to Facebook", "open downloads", "open bookmarks"],
-  addCommandHandler: commander => {
-    commander.addCommands(
-      ["go to download", "open download", "go to downloads", "open downloads"],
-      query => {
+  commands: [
+    {
+      commands: [
+        "go to download",
+        "open download",
+        "go to downloads",
+        "open downloads"
+      ],
+      callback: query => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl("chrome://downloads");
         });
       }
-    );
+    },
 
-    commander.addCommands(
-      ["go to bookmark", "open bookmark", "go to bookmarks", "open bookmarks"],
-      query => {
+    {
+      commands: [
+        "go to bookmark",
+        "open bookmark",
+        "go to bookmarks",
+        "open bookmarks"
+      ],
+      callback: query => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl("chrome://bookmarks");
         });
       }
-    );
+    },
 
-    commander.addCommands(["go to history", "open history"], query => {
-      commander.performActionWithDelay(() => {
-        commander.openTabWithUrl("chrome://history");
-      });
-    });
+    {
+      commands: ["go to history", "open history"],
+      callback: query => {
+        commander.performActionWithDelay(() => {
+          commander.openTabWithUrl("chrome://history");
+        });
+      }
+    },
 
-    commander.addCommands(["go to *query", "open *query"], query => {
-      commander.performActionWithDelay(() => {
-        commander.openTabWithUrl("https://duckduckgo.com/?q=!" + query);
-      });
-    });
-  }
+    {
+      commands: ["go to *query", "open *query"],
+      callback: query => {
+        commander.performActionWithDelay(() => {
+          commander.openTabWithUrl("https://duckduckgo.com/?q=!" + query);
+        });
+      }
+    }
+  ]
 });
 
 plugins.push({
   name: "Voice input",
   icon: mdiPencil,
   queries: ["Submit", "<Anything to write>"],
-  addCommandHandler: commander => {}
+  commands: []
 });
+
+const siteToUrl = {
+  Bing: "https://www.bing.com/search?q=",
+  AOL: "https://search.aol.com/aol/search?q=",
+  Yahoo: "https://search.yahoo.com/search?p=",
+  Amazon: "https://www.amazon.com/s/?field-keywords=",
+  Walmart: "https://www.walmart.com/search/?query=",
+  Target: "https://www.target.com/s?searchTerm=",
+  YouTube: "https://www.youtube.com/results?search_query=",
+  Baidu: "http://www.baidu.com/s?wd=",
+  Wikipedia: "https://www.wikipedia.org/wiki/"
+};
+
+const searchCommands = [];
+for (const key in siteToUrl) {
+  searchCommands.push({
+    commands: [
+      "search for *query on " + key,
+      "search for *query at " + key,
+      "*query on " + key,
+      "*query at " + key
+    ],
+    callback: query => {
+      commander.performActionWithDelay(() => {
+        commander.openTabWithUrl(siteToUrl[key] + query);
+      });
+    },
+    priority: 0.3
+  });
+}
 
 plugins.push({
   name: "Search",
@@ -291,42 +359,16 @@ plugins.push({
     "<query> on (Bing | Yahoo | Amazon | and others)",
     "<All other queries>"
   ],
-  addCommandHandler: commander => {
-    const siteToUrl = {
-      Bing: "https://www.bing.com/search?q=",
-      AOL: "https://search.aol.com/aol/search?q=",
-      Yahoo: "https://search.yahoo.com/search?p=",
-      Amazon: "https://www.amazon.com/s/?field-keywords=",
-      Walmart: "https://www.walmart.com/search/?query=",
-      Target: "https://www.target.com/s?searchTerm=",
-      YouTube: "https://www.youtube.com/results?search_query=",
-      Baidu: "http://www.baidu.com/s?wd=",
-      Wikipedia: "https://www.wikipedia.org/wiki/"
-    };
-    for (const key in siteToUrl) {
-      commander.addCommands(
-        [
-          "search for *query on " + key,
-          "search for *query at " + key,
-          "*query on " + key,
-          "*query at " + key
-        ],
-        query => {
-          commander.performActionWithDelay(() => {
-            commander.openTabWithUrl(siteToUrl[key] + query);
-          });
-        },
-        { priority: .3 },
-      );
-    }
-    commander.addCommands(
-      [
+  commands: [
+    ...searchCommands,
+    {
+      commands: [
         "search for *query on *site",
         "search for *query at *site",
         "*query on *site",
         "*query at *site"
       ],
-      (query, site) => {
+      callback: (query, site) => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl(
             "https://duckduckgo.com/?q=!" +
@@ -334,18 +376,18 @@ plugins.push({
           );
         });
       },
-      { priority: .3 },
-    );
-    commander.addCommands(
-      ["search for *query", "google *query", "*query"],
-      query => {
+      priority: 0.3
+    },
+    {
+      commands: ["search for *query", "google *query", "*query"],
+      callback: query => {
         commander.performActionWithDelay(() => {
           commander.openTabWithUrl("https://www.google.com/search?q=" + query);
         });
       },
-      { priority: .2 },
-    );
-  }
+      priority: 0.2
+    }
+  ]
 });
 
 export default plugins;

@@ -1,4 +1,5 @@
 import { mdiTab } from "@mdi/js";
+import commander from "../commander";
 
 const plugins = [
   {
@@ -15,20 +16,19 @@ const plugins = [
     grammars: [
       "#JSGF V1.0; grammar tabs; public <tab> = close tab | close other tabs | close all tabs;"
     ],
-    addCommandHandler: commander => {
-      /** ------- Tab management commands ------- */
-      commander.addCommands(
-        ["open new tab"],
-        () => {
+    commands: [
+      {
+        /** ------- Tab management commands ------- */
+        commands: ["open new tab"],
+        callback: () => {
           commander.performActionWithDelay(() => {
             chrome.tabs.create({});
           });
         }
-      );
-
-      commander.addCommands(
-        ["close tab", "close this tab", "close the tab"],
-        () => {
+      },
+      {
+        commands: ["close tab", "close this tab", "close the tab"],
+        callback: () => {
           commander.performActionWithDelay(() => {
             chrome.tabs.query(
               {
@@ -42,17 +42,16 @@ const plugins = [
             );
           });
         },
-        { priority: 1 }
-      );
-
-      commander.addCommands(
-        [
+        priority: 1
+      },
+      {
+        commands: [
           "close other tab",
           "close other tabs",
           "close the other tab",
           "close the other tabs"
         ],
-        () => {
+        callback: () => {
           chrome.tabs.query(
             {
               active: false
@@ -64,11 +63,11 @@ const plugins = [
             }
           );
         }
-      );
+      },
 
-      commander.addCommands(
-        ["close tab to the right", "close tabs to the right"],
-        () => {
+      {
+        commands: ["close tab to the right", "close tabs to the right"],
+        callback: () => {
           chrome.tabs.query({}, tabs => {
             let activeTabIndex = -1;
             for (let tab of tabs) {
@@ -83,11 +82,11 @@ const plugins = [
             }
           });
         }
-      );
+      },
 
-      commander.addCommands(
-        ["close tab to the left", "close tabs to the left"],
-        () => {
+      {
+        commands: ["close tab to the left", "close tabs to the left"],
+        callback: () => {
           chrome.tabs.query({}, tabs => {
             let activeTabIndex = -1;
             for (let tab of tabs) {
@@ -102,10 +101,9 @@ const plugins = [
             }
           });
         }
-      );
-
-      commander.addCommands(
-        [
+      },
+      {
+        commands: [
           "close all tab",
           "close all tabs",
           "close all the tab",
@@ -114,18 +112,18 @@ const plugins = [
           "close this window",
           "exit window"
         ],
-        () => {
+        callback: () => {
           commander.performActionWithDelay(() => {
             chrome.windows.getCurrent({}, window => {
               chrome.windows.remove(window.id);
             });
           });
         }
-      );
+      },
 
-      commander.addCommands(
-        ["pin", "pin tab", "pin this tab", "pin the tab"],
-        () => {
+      {
+        commands: ["pin", "pin tab", "pin this tab", "pin the tab"],
+        callback: () => {
           chrome.tabs.query(
             {
               active: true
@@ -137,11 +135,11 @@ const plugins = [
             }
           );
         }
-      );
+      },
 
-      commander.addCommands(
-        ["unpin", "unpin tab", "unpin this tab", "unpin the tab"],
-        () => {
+      {
+        commands: ["unpin", "unpin tab", "unpin this tab", "unpin the tab"],
+        callback: () => {
           chrome.tabs.query(
             {
               active: true
@@ -153,59 +151,65 @@ const plugins = [
             }
           );
         }
-      );
+      },
 
-      commander.addCommands(["mute", "mute tab"], query => {
-        chrome.tabs.query(
-          {
-            active: true
-          },
-          tabs => {
-            if (tabs.length > 0) {
-              chrome.tabs.update(tabs[0].id, { muted: true });
+      {
+        commands: ["mute", "mute tab"],
+        callback: query => {
+          chrome.tabs.query(
+            {
+              active: true
+            },
+            tabs => {
+              if (tabs.length > 0) {
+                chrome.tabs.update(tabs[0].id, { muted: true });
+              }
             }
-          }
-        );
-      });
+          );
+        }
+      },
 
-      commander.addCommands(["unmute", "unmute tab"], query => {
-        chrome.tabs.query(
-          {
-            active: true
-          },
-          tabs => {
-            if (tabs.length > 0) {
-              chrome.tabs.update(tabs[0].id, { muted: false });
+      {
+        commands: ["unmute", "unmute tab"],
+        callback: query => {
+          chrome.tabs.query(
+            {
+              active: true
+            },
+            tabs => {
+              if (tabs.length > 0) {
+                chrome.tabs.update(tabs[0].id, { muted: false });
+              }
             }
-          }
-        );
-      });
+          );
+        }
+      },
 
-      commander.addCommands(
-        ["mute all (the) tab", "mute all (the) tabs"],
-        query => {
+      {
+        commands: ["mute all (the) tab", "mute all (the) tabs"],
+        callback: query => {
           chrome.tabs.query({}, tabs => {
             for (let tab of tabs) {
               chrome.tabs.update(tab.id, { muted: true });
             }
           });
         }
-      );
+      },
 
-      commander.addCommands(
-        ["unmute all (the) tab", "unmute all (the) tabs"],
-        query => {
+      {
+        commands: ["unmute all (the) tab", "unmute all (the) tabs"],
+        callback: query => {
           chrome.tabs.query({}, tabs => {
             for (let tab of tabs) {
               chrome.tabs.update(tab.id, { muted: false });
             }
           });
         }
-      );
+      },
 
-      commander.addCommands(
-        ["mute other (the) tab", "mute other (the) tabs"],
-        query => {
+      {
+        commands: ["mute other (the) tab", "mute other (the) tabs"],
+        callback: query => {
           chrome.tabs.query({}, tabs => {
             for (let tab of tabs) {
               if (!tab.active) {
@@ -214,11 +218,11 @@ const plugins = [
             }
           });
         }
-      );
+      },
 
-      commander.addCommands(
-        ["unmute other (the) tab", "unmute other (the) tabs"],
-        query => {
+      {
+        commands: ["unmute other (the) tab", "unmute other (the) tabs"],
+        callback: query => {
           chrome.tabs.query({}, tabs => {
             for (let tab of tabs) {
               if (!tab.active) {
@@ -227,22 +231,28 @@ const plugins = [
             }
           });
         }
-      );
+      },
 
-      commander.addCommands(["maximize", "maximize window"], query => {
-        chrome.windows.getCurrent({}, window => {
-          chrome.windows.update(window.id, { state: "maximized" });
-        });
-      });
+      {
+        commands: ["maximize", "maximize window"],
+        callback: query => {
+          chrome.windows.getCurrent({}, window => {
+            chrome.windows.update(window.id, { state: "maximized" });
+          });
+        }
+      },
 
-      commander.addCommands(["minimize", "minimize window"], query => {
-        chrome.windows.getCurrent({}, window => {
-          chrome.windows.update(window.id, { state: "minimized" });
-        });
-      });
+      {
+        commands: ["minimize", "minimize window"],
+        callback: query => {
+          chrome.windows.getCurrent({}, window => {
+            chrome.windows.update(window.id, { state: "minimized" });
+          });
+        }
+      },
 
-      commander.addCommands(
-        [
+      {
+        commands: [
           "fullscreen",
           "full screen",
           "full-screen",
@@ -250,22 +260,22 @@ const plugins = [
           "enter full screen",
           "enter full-screen"
         ],
-        query => {
+        callback: query => {
           chrome.windows.getCurrent({}, window => {
             chrome.windows.update(window.id, { state: "fullscreen" });
           });
         }
-      );
+      },
 
-      commander.addCommands(
-        ["exit fullscreen", "exit full screen", "exit full-screen"],
-        query => {
+      {
+        commands: ["exit fullscreen", "exit full screen", "exit full-screen"],
+        callback: query => {
           chrome.windows.getCurrent({}, window => {
             chrome.windows.update(window.id, { state: "normal" });
           });
         }
-      );
-    }
+      }
+    ]
   }
 ];
 
