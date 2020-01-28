@@ -8,7 +8,8 @@ import {
   mdiShopping,
   mdiStar,
   mdiPencil,
-  mdiMagnify
+  mdiMagnify,
+  mdiGoogleChrome
 } from "@mdi/js";
 import commander from "../commander";
 
@@ -44,11 +45,9 @@ plugins.push({
         "pictures of *query"
       ]),
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl(
-            "https://www.google.com/search?tbm=isch&q=" + query
-          );
-        });
+        commander.openTabWithUrl(
+          "https://www.google.com/search?tbm=isch&q=" + query
+        );
       }
     }
   ]
@@ -62,11 +61,9 @@ plugins.push({
     {
       commands: prependQueryPhrase(["news of *query", "news about *query"]),
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl(
-            "https://www.google.com/search?tbm=nws&q=" + query
-          );
-        });
+        commander.openTabWithUrl(
+          "https://www.google.com/search?tbm=nws&q=" + query
+        );
       }
     },
     {
@@ -77,9 +74,7 @@ plugins.push({
         "today's news"
       ]),
       callback: () => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("https://news.google.com/");
-        });
+        commander.openTabWithUrl("https://news.google.com/");
       }
     }
   ]
@@ -102,9 +97,7 @@ plugins.push({
         "how do I get to *query"
       ]),
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("https://www.google.com/maps?q=" + query);
-        });
+        commander.openTabWithUrl("https://www.google.com/maps?q=" + query);
       }
     },
 
@@ -128,9 +121,7 @@ plugins.push({
         "directions from *query"
       ]),
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("https://www.google.com/maps/dir/" + query);
-        });
+        commander.openTabWithUrl("https://www.google.com/maps/dir/" + query);
       }
     },
 
@@ -140,9 +131,7 @@ plugins.push({
         "directions to *query"
       ]),
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("https://www.google.com/maps/dir//" + query);
-        });
+        commander.openTabWithUrl("https://www.google.com/maps/dir//" + query);
       }
     }
   ]
@@ -156,9 +145,7 @@ plugins.push({
     {
       commands: ["wikipedia"],
       callback: () => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("https://wikipedia.org/");
-        });
+        commander.openTabWithUrl("https://wikipedia.org/");
       }
     },
     {
@@ -170,11 +157,9 @@ plugins.push({
         "wikipedia *query"
       ],
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl(
-            "https://en.wikipedia.org/wiki/Special:Search/" + query
-          );
-        });
+        commander.openTabWithUrl(
+          "https://en.wikipedia.org/wiki/Special:Search/" + query
+        );
       }
     }
   ]
@@ -188,9 +173,7 @@ plugins.push({
     {
       commands: ["play video", "video", "play videos", "videos"],
       callback: () => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("https://www.youtube.com/");
-        });
+        commander.openTabWithUrl("https://www.youtube.com/");
       }
     },
     {
@@ -204,11 +187,9 @@ plugins.push({
         "watch *query"
       ]),
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl(
-            "https://www.youtube.com/results?search_query=" + query
-          );
-        });
+        commander.openTabWithUrl(
+          "https://www.youtube.com/results?search_query=" + query
+        );
       }
     }
   ]
@@ -222,9 +203,7 @@ plugins.push({
     {
       commands: ["play music", "music"],
       callback: () => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("https://play.google.com/music/listen");
-        });
+        commander.openTabWithUrl("https://play.google.com/music/listen");
       }
     }
   ]
@@ -238,9 +217,7 @@ plugins.push({
     {
       commands: ["shopping", "buy something"],
       callback: () => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("https://www.amazon.com/");
-        });
+        commander.openTabWithUrl("https://www.amazon.com/");
       }
     },
     {
@@ -251,11 +228,9 @@ plugins.push({
         "buy *query"
       ],
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl(
-            "https://www.amazon.com/s/field-keywords=" + query
-          );
-        });
+        commander.openTabWithUrl(
+          "https://www.amazon.com/s/field-keywords=" + query
+        );
       }
     }
   ]
@@ -274,9 +249,7 @@ plugins.push({
         "open downloads"
       ],
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("chrome://downloads");
-        });
+        commander.openTabWithUrl("chrome://downloads");
       }
     },
 
@@ -288,27 +261,21 @@ plugins.push({
         "open bookmarks"
       ],
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("chrome://bookmarks");
-        });
+        commander.openTabWithUrl("chrome://bookmarks");
       }
     },
 
     {
       commands: ["go to history", "open history"],
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("chrome://history");
-        });
+        commander.openTabWithUrl("chrome://history");
       }
     },
 
     {
       commands: ["go to *query", "open *query"],
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("https://duckduckgo.com/?q=!" + query);
-        });
+        commander.openTabWithUrl("https://duckduckgo.com/?q=!" + query);
       }
     }
   ]
@@ -343,9 +310,7 @@ for (const key in siteToUrl) {
       "*query at " + key
     ],
     callback: query => {
-      commander.performActionWithDelay(() => {
-        commander.openTabWithUrl(siteToUrl[key] + query);
-      });
+      commander.openTabWithUrl(siteToUrl[key] + query);
     },
     priority: 0.3
   });
@@ -369,21 +334,21 @@ plugins.push({
         "*query at *site"
       ],
       callback: (query, site) => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl(
-            "https://duckduckgo.com/?q=!" +
-              encodeURIComponent(query + " on " + site)
-          );
-        });
+        commander.openTabWithUrl(
+          "https://duckduckgo.com/?q=!" +
+            encodeURIComponent(query + " on " + site)
+        );
       },
       priority: 0.3
     },
     {
       commands: ["search for *query", "google *query", "*query"],
       callback: query => {
-        commander.performActionWithDelay(() => {
-          commander.openTabWithUrl("https://www.google.com/search?q=" + query);
-        });
+        commander.openTabWithUrl(
+          "https://www.google.com/search?gs_ivs=1&q=" +
+            encodeURIComponent(query)
+        );
+        commander.clearNotifications();
       },
       priority: 0.2
     }

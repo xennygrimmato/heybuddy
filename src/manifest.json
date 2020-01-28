@@ -25,12 +25,6 @@
       "matches": ["<all_urls>"],
       "js": ["contents_iframe.bundle.js"],
       "run_at": "document_idle"
-    },
-    {
-      "matches": ["<all_urls>"],
-      "all_frames": true,
-      "js": ["input_detector.bundle.js"],
-      "run_at": "document_end"
     }
   ],
   "commands": {

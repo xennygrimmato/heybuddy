@@ -1,15 +1,10 @@
-export default class TextInputManager {
-  constructor(commander) {
-    this.commander_ = commander;
-  }
-
-  addTextInputCommands() {
-    for (const command of ["submit", "enter"]) {
-      annyang.removeCommands(command);
-      annyang.addCommands(
-        {
-          [command]: () => {
-            this.commander_.executeScripts(`
+export function addTextInputCommands(commander) {
+  for (const command of ["submit", "enter"]) {
+    annyang.removeCommands(command);
+    annyang.addCommands(
+      {
+        [command]: () => {
+          commander.executeScripts(`
           const focusedElement = document.activeElement;
           if (focusedElement.form) {
             focusedElement.form.submit();
@@ -22,17 +17,17 @@ export default class TextInputManager {
             }));
           }
         `);
-          }
-        },
-        /* priority */ 0.6
-      );
-    }
-    annyang.removeCommands("*query");
-    annyang.addCommands(
-      {
-        "*query": query => {
-          query = query.replace("'", "\\'");
-          this.commander_.executeScripts(`
+        }
+      },
+      /* priority */ 0.6
+    );
+  }
+  annyang.removeCommands("*query");
+  annyang.addCommands(
+    {
+      "*query": query => {
+        query = query.replace("'", "\\'");
+        commander.executeScripts(`
           const focusedElement = document.activeElement;
           const tagName = focusedElement.tagName.toLowerCase();
           const contenteditable = focusedElement.getAttribute('contenteditable') != '';
@@ -65,9 +60,8 @@ export default class TextInputManager {
             }
           }
         `);
-        }
-      },
-      /* priority */ 0.3
-    );
-  }
+      }
+    },
+    /* priority */ 0.3
+  );
 }

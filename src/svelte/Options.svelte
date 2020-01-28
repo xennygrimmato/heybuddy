@@ -48,18 +48,6 @@
     }
   };
 
-  let voiceDictation = {
-    icon: mdiPencil,
-    title: "Voice input mode",
-    caption: "Enable voice input when focused on a textbox.",
-    errorCaption:
-      "Enable this setting will allow you to use speech to text to compose email, " +
-      "fill out form, take notes, etc.",
-    onClick: enabled => {
-      storage.set({ disableVoiceDictation: !enabled });
-    }
-  };
-
   let shortcut = {
     icon: mdiKeyboard,
     title: "Keyboard shortcut",
@@ -90,11 +78,10 @@
   });
 
   storage.get(
-    ["customHotword", "hotword", "disableInfoPrompt", "disableVoiceDictation"],
+    ["customHotword", "hotword"],
     result => {
       customHotword = result.customHotword || "";
       hotword.enabled = result.hotword;
-      voiceDictation.enabled = !result.disableVoiceDictation;
     }
   );
 
@@ -175,7 +162,6 @@
       {:else}
         <OptionCard option={hotword} />
       {/if}
-      <OptionCard option={voiceDictation} />
       <OptionCard option={shortcut} />
       <Card class="card">
         <Content>

@@ -35,7 +35,6 @@ var options = {
     popup: path.join(__dirname, "src", "js", "popup.js"),
     options: path.join(__dirname, "src", "js", "options.js"),
     background: path.join(__dirname, "src", "js", "background.js"),
-    input_detector: path.join(__dirname, "src", "js", "input_detector.js"),
     notification_ui: path.join(__dirname, "src", "js", "notification_ui.js"),
     contents_iframe: path.join(__dirname, "src", "js", "contents_iframe.js"),
   },

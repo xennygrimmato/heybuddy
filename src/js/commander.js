@@ -1,7 +1,7 @@
 import annyang from "./annyang";
 import { DEBUG, storage } from "./common";
 import NotificationManager from "./notification";
-import TextInputManager from "./text_input";
+import { addTextInputCommands } from "./text_input";
 
 function getHost(url) {
   return new URL(url).host;
@@ -26,7 +26,6 @@ class Commander {
 
     this.notificationManager_ = new NotificationManager();
     this.allPlugins_ = allPlugins;
-    this.textInputManager_ = new TextInputManager(this);
     this.lastCommand_ = "";
     this.popupPort_ = undefined;
     this.enableHotwords_ = false;
@@ -41,7 +40,9 @@ class Commander {
       if (port.name == "chrome-voice-assistant-popup") {
         this.popupPort_ = port;
         this.startListeningToAllCommands();
-        annyang.start();
+        if (!annyang.isListening()) {
+          annyang.start();
+        }
         port.onDisconnect.addListener(eventPort => {
           if (eventPort === this.popupPort_) {
             this.popupPort_ = undefined;
@@ -62,23 +63,11 @@ class Commander {
             url: request.url
           });
           break;
-        case "START_TEXT_INPUT":
-          await this.startListeningToTextInput();
-          this.notificationManager_.sendMessage({
-            type: "START_LISTENING",
-            title: "Voice input mode",
-            content: "Ready to transcribe your speech"
-          });
-          break;
-        case "STOP_TEXT_INPUT":
-          await this.startListeningToTriggerCommands();
-          this.startListeningToAllCommands();
-          break;
         case "QUERY":
           annyang.trigger(request.query);
           break;
         case "CLEAR_NOTIFICATION":
-          this.notificationManager_.clearMessage();
+          this.clearNotifications();
           break;
         case "TAB_LOADED":
           this.notificationManager_.resendMessageIfAvailable();
@@ -123,8 +112,6 @@ class Commander {
       }
       this.sendResultMessage(userSaid);
       this.lastCommand_ = userSaid;
-      await this.startListeningToTriggerCommands();
-      this.startListeningToAllCommands();
     });
 
     annyang.addCallback("result", results => {
@@ -152,6 +139,11 @@ class Commander {
     }
   }
 
+  clearNotifications() {
+    this.startListeningToTriggerCommands();
+    this.notificationManager_.clearMessage();
+  }
+
   async startListeningToTextInput() {
     if (DEBUG) {
       console.log("Listening to text input commands");
@@ -160,10 +152,22 @@ class Commander {
       abortIfHotwordDisabled: false
     });
     this.startListeningToAllCommands();
-    this.textInputManager_.addTextInputCommands();
-    if (!annyang.isListening()) {
-      annyang.start();
-    }
+    addTextInputCommands(this);
+    this.notificationManager_.sendMessage({
+      type: "START_LISTENING",
+      title: "Voice input mode",
+      content: "Ready to transcribe your speech"
+    });
+  }
+
+  async stopListeningToTextInput() {
+    await commander.startListeningToTriggerCommands();
+    commander.startListeningToAllCommands();
+    this.notificationManager_.sendMessage({
+      type: "START_LISTENING",
+      title: "Exit voice input mode",
+      content: "Listening to regular commands"
+    });
   }
 
   startListeningToAllCommands() {
@@ -298,12 +302,6 @@ class Commander {
   /** ------- Handle Triggering commands ------- */
   initTriggerCommands_() {
     const triggerFunction = () => {
-      // if (this.notificationManager_.hasMessage()) {
-      //   this.performActionWithDelay(() => {
-      //     this.sendResultMessage("Yes? I am listening.");
-      //   });
-      //   return;
-      // }
       this.notificationManager_.sendMessage({
         type: "START_LISTENING",
         title: "Listening",
