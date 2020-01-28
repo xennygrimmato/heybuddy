@@ -121,12 +121,12 @@
 
   var registerCommand = function(command, callback, originalPhrase, priority) {
     commandsList.push({ command, callback, originalPhrase, priority });
-    if (debugState) {
-      logMessage(
-        "Command successfully loaded: %c" + originalPhrase,
-        debugStyle
-      );
-    }
+    // if (debugState) {
+    //   logMessage(
+    //     "Command successfully loaded: %c" + originalPhrase,
+    //     debugStyle
+    //   );
+    // }
   };
 
   var parseResults = function(results, isFinal) {
@@ -170,15 +170,14 @@
       }
     }
     if (bestMatchCommand) {
-      console.log(bestMatchCommand);
-      // execute the matched command
-      bestMatchCommand.callback.apply(this, bestCommandParameters);
       invokeCallbacks(
         callbacks.resultMatch,
         bestCommandText,
         bestMatchCommand.originalPhrase,
         results
       );
+      // execute the matched command
+      bestMatchCommand.callback.apply(this, bestCommandParameters);
       return;
     }
     invokeCallbacks(callbacks.result, results);

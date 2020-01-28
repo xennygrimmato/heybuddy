@@ -48,17 +48,6 @@
     }
   };
 
-  let notifications = {
-    icon: mdiBellRing,
-    title: "Microphone blocked notifications",
-    caption: `Show a notification when visiting a site that has been granted microphone access.`,
-    errorCaption: `Notifications will not be shown on sites that have been granted microphone access.
-      Microphones may not work on those sites when hotword detection is enabled.`,
-    onClick: enabled => {
-      storage.set({ disableInfoPrompt: !enabled });
-    }
-  };
-
   let voiceDictation = {
     icon: mdiPencil,
     title: "Voice input mode",
@@ -105,7 +94,6 @@
     result => {
       customHotword = result.customHotword || "";
       hotword.enabled = result.hotword;
-      notifications.enabled = !result.disableInfoPrompt;
       voiceDictation.enabled = !result.disableVoiceDictation;
     }
   );
@@ -113,11 +101,9 @@
   navigator.mediaDevices
     .getUserMedia({ audio: true })
     .then(stream => {
-      console.log("Voice option enabled");
       voiceOption.enabled = true;
     })
     .catch(error => {
-      console.log("Voice option disabled");
       voiceOption.enabled = false;
     });
 
@@ -186,10 +172,8 @@
     <div class="transition-container" transition:fly={{ x: -200 }}>
       {#if !voiceOption.enabled}
         <OptionCard option={voiceOption} />
-      {/if}
-      {#if voiceOption.enabled}
+      {:else}
         <OptionCard option={hotword} />
-        <OptionCard option={notifications} />
       {/if}
       <OptionCard option={voiceDictation} />
       <OptionCard option={shortcut} />

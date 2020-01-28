@@ -1,5 +1,7 @@
 import { DEBUG } from "./common";
 
+const NOTIFICATION_TIMEOUT = 15000; 
+
 export default class NotificationManager {
   constructor() {
     this.lastData_ = undefined;
@@ -10,6 +12,7 @@ export default class NotificationManager {
   }
 
   clearMessage() {
+    this.lastData_ = null;
     return this.innerSendMessage({
       type: "CLEAR_NOTIFICATION"
     });
@@ -20,15 +23,22 @@ export default class NotificationManager {
     await this.innerSendMessage(request);
     setTimeout(() => {
       if (this.lastData_ === request) {
-        this.lastData_ = null;
         this.clearMessage();
       }
-    }, 5000);
+    }, NOTIFICATION_TIMEOUT);
+  }
+
+  async resendMessageIfAvailable() {
+    if (this.lastData_) {
+      await this.innerSendMessage(this.lastData_);
+    } else {
+      await this.clearMessage();
+    }
   }
 
   async innerSendMessage(request) {
     if (DEBUG) {
-      console.log(`Sending request`, request);
+      console.log(`Sending request: ${JSON.stringify(request)}`);
     }
     chrome.runtime.sendMessage(request);
     try {

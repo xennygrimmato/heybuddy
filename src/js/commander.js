@@ -40,6 +40,10 @@ class Commander {
     this.enableHotwords_ = false;
     this.commandPriorities_ = {};
 
+    chrome.tabs.onActivated.addListener(activeInfo => {
+      this.notificationManager_.resendMessageIfAvailable();
+    });
+
     /** ------- Connection with popup window ------- */
     chrome.runtime.onConnect.addListener(port => {
       if (port.name == "chrome-voice-assistant-popup") {
@@ -47,9 +51,10 @@ class Commander {
         this.startListeningToAllCommands();
         annyang.start();
         port.onDisconnect.addListener(eventPort => {
-          if (eventPort == this.popupPort_) {
+          if (eventPort === this.popupPort_) {
             this.popupPort_ = undefined;
             this.startListeningToTriggerCommands();
+            this.notificationManager_.clearMessage();
           }
         });
       }
@@ -57,7 +62,7 @@ class Commander {
 
     chrome.runtime.onMessage.addListener(async (request, sender) => {
       if (DEBUG) {
-        console.log(`Received message: `, request);
+        console.log(`Received message: ${JSON.stringify(request)}`);
       }
       switch (request.type) {
         case "OPEN_URL":
@@ -80,19 +85,11 @@ class Commander {
         case "QUERY":
           annyang.trigger(request.query);
           break;
+        case "CLEAR_NOTIFICATION":
+          this.notificationManager_.clearMessage();
+          break;
         case "TAB_LOADED":
-          if (request.isMicEnabled && this.enableHotwords_) {
-            storage.get(["disableInfoPrompt"], result => {
-              if (result.disableInfoPrompt) {
-                return;
-              }
-              // this.notificationManager_.showInfoMessage(
-              //   `Microphone may not work on ${getHost(
-              //     sender.url
-              //   )} because hotword detection is enabled.`
-              // );
-            });
-          }
+          this.notificationManager_.resendMessageIfAvailable();
           break;
       }
     });
@@ -164,6 +161,9 @@ class Commander {
   }
 
   async startListeningToTextInput() {
+    if (DEBUG) {
+      console.log("Listening to text input commands");
+    }
     await this.startListeningToTriggerCommands({
       abortIfHotwordDisabled: false
     });
@@ -175,17 +175,27 @@ class Commander {
   }
 
   startListeningToAllCommands() {
-    for (const key in this.regularCommands_) {
-      annyang.addCommands(
-        { [key]: this.regularCommands_[key] },
-        this.commandPriorities_[key]
-      );
-    }
+    this.performActionWithDelay(() => {
+      if (this.popupPort_ || this.notificationManager_.hasMessage()) {
+        if (DEBUG) {
+          console.log("Listening to all commands");
+        }
+        for (const key in this.regularCommands_) {
+          annyang.addCommands(
+            { [key]: this.regularCommands_[key] },
+            this.commandPriorities_[key]
+          );
+        }
+      }
+    });
   }
 
   async startListeningToTriggerCommands({
     abortIfHotwordDisabled = true
   } = {}) {
+    if (DEBUG) {
+      console.log("Listening to trigger commands");
+    }
     await this.initTriggerCommands_();
     this.initRegularCommands_();
     annyang.removeCommands();
@@ -378,10 +388,10 @@ class Commander {
           if (!keys.includes("commands") || !keys.includes("callback")) {
             console.error(`Invalid command in plugin: `, command);
           }
-          this.addCommands(command.commands, command.callback, {
-            priority: command.priority || DEFAULT_COMMAND_PRIORITY
-          });
         }
+        this.addCommands(command.commands, command.callback, {
+          priority: command.priority || DEFAULT_COMMAND_PRIORITY
+        });
       }
     }
   }

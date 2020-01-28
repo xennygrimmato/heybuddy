@@ -259,7 +259,7 @@
     {/if}
 
     <div class="hint">
-      <a href="/options.html" target="_blank">See all supported commands</a>
+      <a href="/options.html?tab=1" target="_blank">See all supported commands</a>
       .
     </div>
   </div>
