@@ -8,10 +8,11 @@ import {
   mdiShopping,
   mdiStar,
   mdiPencil,
-  mdiMagnify,
-  mdiGoogleChrome
+  mdiMagnify
 } from "@mdi/js";
 import commander from "../commander";
+import cheerio from "cheerio";
+import axios from "axios";
 
 /** ------- Search query ------- */
 const prependQueryPhrase = queries => {
@@ -23,6 +24,30 @@ const prependQueryPhrase = queries => {
   }
   return updatedQueries;
 };
+
+async function loadAndParsePage(url) {
+  const response = await axios.get(url);
+  const parsedResponse = cheerio.load(response.data);
+  return parsedResponse;
+}
+
+async function generateGoogleLuckyUrl(query) {
+  const parsedResponse = await loadAndParsePage(
+    "https://www.google.com/"
+  );
+  const sxsrf = parsedResponse("input[name='sxsrf']").attr("value");
+  const ei = parsedResponse("input[name='ei']").attr("value");
+  const iflsig = parsedResponse("input[name='iflsig']").attr("value");
+  const source = parsedResponse("input[name='source']").attr("value");
+  const url = new URL("https://www.google.com/search");
+  url.searchParams.set("sxsrf", sxsrf);
+  url.searchParams.set("ei", ei);
+  url.searchParams.set("iflsig", iflsig);
+  url.searchParams.set("source", source);
+  url.searchParams.set("btnI", "I'm Feeling Lucky");
+  url.searchParams.set("q", query);
+  return url.href;
+}
 
 const plugins = [];
 
@@ -274,8 +299,8 @@ plugins.push({
 
     {
       commands: ["go to *query", "open *query"],
-      callback: query => {
-        commander.openTabWithUrl("https://duckduckgo.com/?q=!" + query);
+      callback: async query => {
+        commander.openTabWithUrl(await generateGoogleLuckyUrl(query));
       }
     }
   ]
@@ -333,11 +358,8 @@ plugins.push({
         "*query on *site",
         "*query at *site"
       ],
-      callback: (query, site) => {
-        commander.openTabWithUrl(
-          "https://duckduckgo.com/?q=!" +
-            encodeURIComponent(query + " on " + site)
-        );
+      callback: async (query, site) => {
+        commander.openTabWithUrl(await generateGoogleLuckyUrl(query + " on " + site));
       },
       priority: 0.3
     },
