@@ -6,6 +6,7 @@
     mdiPencil,
     mdiKeyboard,
     mdiTextToSpeech,
+    mdiContactMail,
     mdiThumbUp
   } from "@mdi/js";
   import Card, { Content } from "@smui/card";
@@ -45,7 +46,7 @@
     icon: mdiMicrophone,
     title: '"Hey buddy" hotword detection',
     caption:
-      'We will listen to "Hey buddy" hotword command in the background. Click here to disable hotword detection.',
+      'We will listen to "Hey Buddy" hotword command in the background. Click here to disable hotword detection.',
     errorCaption:
       "Hotword detection is disabled. Click here to enable hotword detection",
     onClick: enabled => {
@@ -55,11 +56,13 @@
 
   let tts = {
     icon: mdiTextToSpeech,
-    title: 'Voice response on search result',
+    title: "Voice response on search result",
     caption:
-      'Auto play voice response on Google search result page if available.',
+      "Auto play voice response on Google search result page if available. Note that to avoid the sound from the voice " +
+      'response from feeding back into the microphone, "Hey Buddy" will stop listening after performing a search result. ' +
+      'You can trigger it again by saying the "Hey Buddy" hotword or click on the "Hey Buddy" icon in browser extension area.',
     errorCaption:
-      "Voice response is disabled. Click here to enable voice response on Google search result.",
+      "Voice response is disabled. Click here to enable automatically reading the voice response on Google search result.",
     onClick: enabled => {
       storage.set({ tts: enabled });
     }
@@ -114,7 +117,9 @@
           });
           voiceOption.enabled = true;
           storage.set({ hotword: true }, () => {
-            chrome.tabs.update({ url: 'https://bewisse.com/heybuddy/thankyou/' });
+            chrome.tabs.update({
+              url: "https://bewisse.com/heybuddy/thankyou/"
+            });
           });
           clearInterval(intervalHandle);
         } catch (ignored) {}
@@ -168,12 +173,16 @@
       <Label class="logo-text">Hey Buddy - Chrome Voice Assistant</Label>
     </Button>
     <Button
-      class="reviews-button"
       href="https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem"
       target="_blank">
       <MdiIcon size="24" icon={mdiThumbUp} color={ICON_COLOR} />
       &nbsp;
       <Label color={ICON_COLOR}>Rate us!</Label>
+    </Button>
+    <Button href="https://bewisse.com/contact/" target="_blank">
+      <MdiIcon size="24" icon={mdiContactMail} color={ICON_COLOR} />
+      &nbsp;
+      <Label color={ICON_COLOR}>Contact us!</Label>
     </Button>
   </h1>
 
@@ -199,7 +208,9 @@
         <OptionCard option={voiceOption} />
       {:else}
         <Snackbar bind:this={micPermissionGrantedSnackbar}>
-          <SnackbarLabel>Great! You are all set! Just say "Hey Buddy" to start!</SnackbarLabel>
+          <SnackbarLabel>
+            Great! You are all set! Just say "Hey Buddy" to start!
+          </SnackbarLabel>
         </Snackbar>
         <OptionCard option={hotword} />
         <OptionCard option={tts} />
