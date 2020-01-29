@@ -8,6 +8,8 @@
 
 <style>
   :global(.option-plugin-card) {
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.16),
+      0 2px 10px 0 rgba(0, 0, 0, 0.12);
     margin: 2px;
     flex-grow: 5;
     width: calc(50% - 4px);

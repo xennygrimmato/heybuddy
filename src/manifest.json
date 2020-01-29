@@ -45,7 +45,8 @@
     "storage"
   ],
   "web_accessible_resources": [
-    "notification_ui.html"
+    "notification_ui.html",
+    "img/*"
   ],
   "optional_permissions": ["bookmarks"],
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"

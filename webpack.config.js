@@ -97,6 +97,7 @@ var options = {
   plugins: [
     // clean the build folder
     new CleanWebpackPlugin({
+      cleanStaleWebpackAssets: false,
       cleanOnceBeforeBuildPatterns: [path.join(__dirname, "build")]
     }),
     new MiniCssExtractPlugin(),

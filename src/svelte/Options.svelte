@@ -5,9 +5,11 @@
     mdiBellRing,
     mdiPencil,
     mdiKeyboard,
-    mdiComment
+    mdiTextToSpeech,
+    mdiThumbUp
   } from "@mdi/js";
   import Card, { Content } from "@smui/card";
+  import Snackbar, { Label as SnackbarLabel } from "@smui/snackbar";
   import Textfield from "@smui/textfield";
   import Tab, { Icon, Label as TabLabel } from "@smui/tab";
   import TabBar from "@smui/tab-bar";
@@ -19,6 +21,7 @@
   import { DEBUG, ICON_COLOR, storage } from "../js/common";
   import { allPlugins } from "../js/plugins";
 
+  let micPermissionGrantedSnackbar;
   let tabs = ["Options", "Supported commands"];
   const tabIndex = new URL(window.location).searchParams.get("tab") || 0;
   let activeTab = tabs[tabIndex];
@@ -41,11 +44,24 @@
   let hotword = {
     icon: mdiMicrophone,
     title: '"Hey buddy" hotword detection',
-    caption: 'We will listen to "Hey buddy" hotword command in the background.',
+    caption:
+      'We will listen to "Hey buddy" hotword command in the background. Click here to disable hotword detection.',
     errorCaption:
-      "Hotword detection is not enabled. Click here to trigger by saying the hotword",
+      "Hotword detection is disabled. Click here to enable hotword detection",
     onClick: enabled => {
       storage.set({ hotword: enabled });
+    }
+  };
+
+  let tts = {
+    icon: mdiTextToSpeech,
+    title: 'Voice response on search result',
+    caption:
+      'Auto play voice response on Google search result page if available.',
+    errorCaption:
+      "Voice response is disabled. Click here to enable voice response on Google search result.",
+    onClick: enabled => {
+      storage.set({ tts: enabled });
     }
   };
 
@@ -78,13 +94,11 @@
     shortcut.enabled = !!shortcut.caption;
   });
 
-  storage.get(
-    ["customHotword", "hotword"],
-    result => {
-      customHotword = result.customHotword || "";
-      hotword.enabled = result.hotword;
-    }
-  );
+  storage.get(["customHotword", "tts", "hotword"], result => {
+    customHotword = result.customHotword || "";
+    tts.enabled = result.tts;
+    hotword.enabled = result.hotword;
+  });
 
   navigator.mediaDevices
     .getUserMedia({ audio: true })
@@ -93,6 +107,18 @@
     })
     .catch(error => {
       voiceOption.enabled = false;
+      const intervalHandle = setInterval(async () => {
+        try {
+          const hasMicAccess = await navigator.mediaDevices.getUserMedia({
+            audio: true
+          });
+          voiceOption.enabled = true;
+          storage.set({ hotword: true }, () => {
+            chrome.tabs.update({ url: 'https://bewisse.com/heybuddy/thankyou/' });
+          });
+          clearInterval(intervalHandle);
+        } catch (ignored) {}
+      }, 1000);
     });
 
   $: storage.set({ customHotword });
@@ -137,7 +163,7 @@
 <div class="main-content">
   <h1 class="mdc-typography--headline6">
     <Button href="https://bewisse.com/heybuddy/">
-      <img class="logo" src="img/icon_128.png" height="32" alt="Logo" />
+      <img class="logo" src="/img/icon_128.png" height="32" alt="Logo" />
       &nbsp;
       <Label class="logo-text">Hey Buddy - Chrome Voice Assistant</Label>
     </Button>
@@ -145,9 +171,9 @@
       class="reviews-button"
       href="https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem"
       target="_blank">
-      <MdiIcon size="24" icon={mdiComment} color={ICON_COLOR} />
+      <MdiIcon size="24" icon={mdiThumbUp} color={ICON_COLOR} />
       &nbsp;
-      <Label color={ICON_COLOR}>Review & Feedbacks</Label>
+      <Label color={ICON_COLOR}>Rate us!</Label>
     </Button>
   </h1>
 
@@ -159,32 +185,47 @@
   {#if activeTab === tabs[0]}
     <div class="transition-container" transition:fly={{ x: -200 }}>
       {#if !voiceOption.enabled}
+        <Card class="card">
+          <Content>
+            <div class="mdc-typography--subtitle1">
+              🎉 Thank you for installing Hey Buddy 🎉
+            </div>
+            <div class="mdc-typography--subtitle2">
+              We just need one more permission from you to access your
+              microphone
+            </div>
+          </Content>
+        </Card>
         <OptionCard option={voiceOption} />
       {:else}
+        <Snackbar bind:this={micPermissionGrantedSnackbar}>
+          <SnackbarLabel>Great! You are all set! Just say "Hey Buddy" to start!</SnackbarLabel>
+        </Snackbar>
         <OptionCard option={hotword} />
+        <OptionCard option={tts} />
+        <OptionCard option={shortcut} />
+        <Card class="card">
+          <Content>
+            <div class="mdc-typography--subtitle1">Hotwords</div>
+            <div class="mdc-typography--caption">
+              Say one of these hotwords to trigger Hey Buddy by voice.
+            </div>
+            <Textfield
+              variant="filled"
+              disabled
+              class="hotword-input"
+              value="Hey Buddy (default and cannot be changed)"
+              input$readonly
+              input$aria-readonly />
+            <Textfield
+              variant="outlined"
+              class="hotword-input"
+              input$placeholder="Set custom hotword"
+              bind:value={customHotword}
+              input$minlength="5" />
+          </Content>
+        </Card>
       {/if}
-      <OptionCard option={shortcut} />
-      <Card class="card">
-        <Content>
-          <div class="mdc-typography--subtitle1">Hotwords</div>
-          <div class="mdc-typography--caption">
-            Say one of these hotwords to trigger Hey Buddy by voice.
-          </div>
-          <Textfield
-            variant="filled"
-            disabled
-            class="hotword-input"
-            value="Hey Buddy (default and cannot be changed)"
-            input$readonly
-            input$aria-readonly />
-          <Textfield
-            variant="outlined"
-            class="hotword-input"
-            input$placeholder="Set custom hotword"
-            bind:value={customHotword}
-            input$minlength="5" />
-        </Content>
-      </Card>
     </div>
   {/if}
   {#if activeTab === tabs[1]}

@@ -32,9 +32,7 @@ async function loadAndParsePage(url) {
 }
 
 async function generateGoogleLuckyUrl(query) {
-  const parsedResponse = await loadAndParsePage(
-    "https://www.google.com/"
-  );
+  const parsedResponse = await loadAndParsePage("https://www.google.com/");
   const sxsrf = parsedResponse("input[name='sxsrf']").attr("value");
   const ei = parsedResponse("input[name='ei']").attr("value");
   const iflsig = parsedResponse("input[name='iflsig']").attr("value");
@@ -359,18 +357,30 @@ plugins.push({
         "*query at *site"
       ],
       callback: async (query, site) => {
-        commander.openTabWithUrl(await generateGoogleLuckyUrl(query + " on " + site));
+        commander.openTabWithUrl(
+          await generateGoogleLuckyUrl(query + " on " + site)
+        );
       },
       priority: 0.3
     },
     {
       commands: ["search for *query", "google *query", "*query"],
       callback: query => {
-        commander.openTabWithUrl(
-          "https://www.google.com/search?gs_ivs=1&q=" +
-            encodeURIComponent(query)
-        );
-        commander.clearNotifications();
+        chrome.storage.local.get(["tts"], result => {
+          // If TTS is enabled, we need to clear notifications to avoid the TTS to feedback into the command.
+          if (result.tts) {
+            commander.openTabWithUrl(
+              "https://www.google.com/search?gs_ivs=1&q=" +
+                encodeURIComponent(query)
+            );
+            commander.clearNotifications();
+          } else {
+            commander.openTabWithUrl(
+              "https://www.google.com/search?q=" +
+                encodeURIComponent(query)
+            );
+          }
+        });
       },
       priority: 0.2
     }

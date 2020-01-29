@@ -135,12 +135,14 @@
 <style>
   :global(html) {
     width: 480px;
-    height: 400px;
+    height: 390px;
     overflow: hidden;
+    font-size: 16px;
   }
 
   :global(a) {
     color: #2196f3;
+    text-decoration: none;
   }
 
   .main {
@@ -167,6 +169,7 @@
   }
 
   .hint {
+    font-size: 16px;
     bottom: 5px;
     color: #aaa;
     position: absolute;
@@ -208,7 +211,14 @@
     color: #ffffff;
   }
 
+  .thumb-up-icon {
+    vertical-align: middle;
+    width: 18px;
+    height: 18px;
+  }
+
   .reviews {
+    font-size: 16px;
     right: 10px;
     position: absolute;
   }
@@ -220,7 +230,15 @@
     class="reviews"
     href="https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem"
     target="_blank">
-    Review / Send feedbacks
+    <svg class="thumb-up-icon" viewBox="0 0 24 24">
+      <path
+        fill="#2196f3"
+        d="M23,10C23,8.89 22.1,8 21,8H14.68L15.64,3.43C15.66,3.33 15.67,3.22
+        15.67,3.11C15.67,2.7 15.5,2.32 15.23,2.05L14.17,1L7.59,7.58C7.22,7.95
+        7,8.45 7,9V19A2,2 0 0,0 9,21H18C18.83,21 19.54,20.5
+        19.84,19.78L22.86,12.73C22.95,12.5 23,12.26 23,12V10M1,21H5V9H1V21Z" />
+    </svg>
+    Rate us!
   </a>
   <div class="query-form">
     <input
@@ -259,8 +277,9 @@
     {/if}
 
     <div class="hint">
-      <a href="/options.html?tab=1" target="_blank">See all supported commands</a>
-      .
+      <a href="/options.html?tab=1" target="_blank">
+        See all supported commands
+      </a>
     </div>
   </div>
 </div>
