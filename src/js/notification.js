@@ -1,4 +1,5 @@
 import { DEBUG } from "./common";
+import { updateBrowserAction } from "./browser_actions";
 
 const NOTIFICATION_TIMEOUT = 15000; 
 
@@ -13,6 +14,7 @@ export default class NotificationManager {
 
   clearMessage() {
     this.lastData_ = null;
+    updateBrowserAction(false);
     return this.innerSendMessage({
       type: "CLEAR_NOTIFICATION"
     });

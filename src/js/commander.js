@@ -2,6 +2,7 @@ import annyang from "./annyang";
 import { DEBUG, storage } from "./common";
 import NotificationManager from "./notification";
 import { addTextInputCommands } from "./text_input";
+import { updateBrowserAction } from "./browser_actions";
 
 function getHost(url) {
   return new URL(url).host;
@@ -27,7 +28,6 @@ class Commander {
     this.notificationManager_ = new NotificationManager();
     this.allPlugins_ = allPlugins;
     this.lastCommand_ = "";
-    this.popupPort_ = undefined;
     this.enableHotwords_ = false;
     this.commandPriorities_ = {};
 
@@ -35,29 +35,14 @@ class Commander {
       this.notificationManager_.resendMessageIfAvailable();
     });
 
-    /** ------- Connection with popup window ------- */
-    chrome.runtime.onConnect.addListener(port => {
-      if (port.name == "chrome-voice-assistant-popup") {
-        this.popupPort_ = port;
-        this.startListeningToAllCommands();
-        if (!annyang.isListening()) {
-          annyang.start();
-        }
-        port.onDisconnect.addListener(eventPort => {
-          if (eventPort === this.popupPort_) {
-            this.popupPort_ = undefined;
-            this.startListeningToTriggerCommands();
-            this.notificationManager_.clearMessage();
-          }
-        });
-      }
-    });
-
     chrome.runtime.onMessage.addListener(async (request, sender) => {
       if (DEBUG) {
         console.log(`Received message: ${JSON.stringify(request)}`);
       }
       switch (request.type) {
+        case "TRIGGER":
+          this.trigger();
+          break;
         case "OPEN_URL":
           chrome.tabs.create({
             url: request.url
@@ -92,10 +77,7 @@ class Commander {
         this.enableHotwords_ = hotword.newValue;
         if (hotword.newValue) {
           annyang.start();
-        } else if (
-          !this.popupPort_ &&
-          !this.notificationManager_.hasMessage()
-        ) {
+        } else if (!this.notificationManager_.hasMessage()) {
           annyang.abort();
         }
       }
@@ -105,7 +87,6 @@ class Commander {
       }
     });
 
-    // Send the result to the popup.
     annyang.addCallback("resultMatch", async userSaid => {
       if (DEBUG) {
         console.log(`ResultMatch: ${userSaid}`);
@@ -116,10 +97,7 @@ class Commander {
 
     annyang.addCallback("result", results => {
       const result = results[0];
-      if (
-        result &&
-        (this.popupPort_ || this.notificationManager_.hasMessage())
-      ) {
+      if (result && this.notificationManager_.hasMessage()) {
         this.notificationManager_.sendMessage({
           type: "PENDING_RESULT",
           title: "Listening",
@@ -137,6 +115,7 @@ class Commander {
         console.log("end");
       });
     }
+    updateBrowserAction(false);
   }
 
   clearNotifications() {
@@ -171,8 +150,14 @@ class Commander {
   }
 
   startListeningToAllCommands() {
+    this.notificationManager_.sendMessage({
+      type: "START_LISTENING",
+      title: "Listening",
+      content: "Hi, how can I help you?"
+    });
+    updateBrowserAction(true);
     this.performActionWithDelay(() => {
-      if (this.popupPort_ || this.notificationManager_.hasMessage()) {
+      if (this.notificationManager_.hasMessage()) {
         if (DEBUG) {
           console.log("Listening to all commands");
         }
@@ -219,7 +204,7 @@ class Commander {
   }
 
   sendResultMessage(userSaid) {
-    if (this.popupPort_ || this.notificationManager_.hasMessage()) {
+    if (this.notificationManager_.hasMessage()) {
       this.notificationManager_.sendMessage({
         type: "RESULT",
         title: "Received command",
@@ -230,7 +215,7 @@ class Commander {
 
   /** ------- Helper functions to perform actions ------- */
   async performAction(action) {
-    if (this.popupPort_ || this.notificationManager_.hasMessage()) {
+    if (this.notificationManager_.hasMessage()) {
       action();
     }
   }
@@ -241,7 +226,12 @@ class Commander {
     }, 100);
   }
 
-  requestPermissions(permissions, originalMessage, requestPermissionMessage, callback) {
+  requestPermissions(
+    permissions,
+    originalMessage,
+    requestPermissionMessage,
+    callback
+  ) {
     chrome.permissions.request(
       {
         permissions: permissions
@@ -255,7 +245,7 @@ class Commander {
             title: "Permission needed",
             content: requestPermissionMessage,
             originalMessage,
-            permissions,
+            permissions
           });
         }
       }
@@ -299,27 +289,32 @@ class Commander {
     });
   }
 
+  trigger() {
+    this.getActiveTab(activeTab => {
+      if (!activeTab.url || activeTab.url.startsWith("chrome")) {
+        // We can't use content script on chrome URLs, so need to create a new tab.
+        chrome.tabs.create({ url: "https://www.google.com" }, () =>
+          this.startListeningToAllCommands()
+        );
+      } else {
+        this.startListeningToAllCommands();
+      }
+    });
+  }
+
   /** ------- Handle Triggering commands ------- */
   initTriggerCommands_() {
-    const triggerFunction = () => {
-      this.notificationManager_.sendMessage({
-        type: "START_LISTENING",
-        title: "Listening",
-        content: "Hi, how can I help you?"
-      });
-      this.startListeningToAllCommands();
-    };
     return new Promise((resolve, reject) => {
       const hotword = "hey buddy";
       this.triggerCommands_ = {
-        [hotword]: triggerFunction
+        [hotword]: this.trigger
       };
       this.commandPriorities_[hotword] = 1;
       storage.get(["customHotword"], result => {
         if (result.customHotword) {
           this.triggerCommands_[
             result.customHotword.toLowerCase()
-          ] = triggerFunction;
+          ] = this.trigger;
           this.commandPriorities_[result.customHotword.toLowerCase()] = 1;
         }
         resolve();
