@@ -7,7 +7,6 @@ import {
   mdiMusic,
   mdiShopping,
   mdiStar,
-  mdiPencil,
   mdiMagnify
 } from "@mdi/js";
 import commander from "../commander";
@@ -302,13 +301,6 @@ plugins.push({
       }
     }
   ]
-});
-
-plugins.push({
-  name: "Voice input",
-  icon: mdiPencil,
-  queries: ["Submit", "<Anything to write>"],
-  commands: []
 });
 
 const siteToUrl = {

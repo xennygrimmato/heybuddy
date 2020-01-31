@@ -10,7 +10,6 @@
     mdiThumbUp
   } from "@mdi/js";
   import Card, { Content } from "@smui/card";
-  import Snackbar, { Label as SnackbarLabel } from "@smui/snackbar";
   import Textfield from "@smui/textfield";
   import Tab, { Icon, Label as TabLabel } from "@smui/tab";
   import TabBar from "@smui/tab-bar";
@@ -22,7 +21,6 @@
   import { DEBUG, ICON_COLOR, storage } from "../js/common";
   import { allPlugins } from "../js/plugins";
 
-  let micPermissionGrantedSnackbar;
   let tabs = ["Options", "Supported commands"];
   const tabIndex = new URL(window.location).searchParams.get("tab") || 0;
   let activeTab = tabs[tabIndex];
@@ -60,7 +58,7 @@
     caption:
       "Auto play voice response on Google search result page if available. Note that to avoid the sound from the voice " +
       'response from feeding back into the microphone, "Hey Buddy" will stop listening after performing a search result. ' +
-      'You can trigger it again by saying the "Hey Buddy" hotword or click on the "Hey Buddy" icon in browser extension area.',
+      'You can trigger it again by saying the "Hey Buddy" hotword or by clicking on the "Hey Buddy" icon in browser extension area.',
     errorCaption:
       "Voice response is disabled. Click here to enable automatically reading the voice response on Google search result.",
     onClick: enabled => {
@@ -133,7 +131,8 @@
   :global(.main-content) {
     margin: auto;
     padding: 5px;
-    width: 600px;
+    width: 800px;
+    text-align: center;
   }
 
   :global(.hotword-input) {
@@ -161,7 +160,7 @@
 
   .transition-container {
     position: absolute;
-    width: 600px;
+    width: 800px;
   }
 </style>
 
@@ -172,6 +171,8 @@
       &nbsp;
       <Label class="logo-text">Hey Buddy - Chrome Voice Assistant</Label>
     </Button>
+  </h1>
+  <div>
     <Button
       href="https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem"
       target="_blank">
@@ -179,12 +180,13 @@
       &nbsp;
       <Label color={ICON_COLOR}>Rate us!</Label>
     </Button>
+    &nbsp;
     <Button href="https://bewisse.com/contact/" target="_blank">
       <MdiIcon size="24" icon={mdiContactMail} color={ICON_COLOR} />
       &nbsp;
       <Label color={ICON_COLOR}>Contact us!</Label>
     </Button>
-  </h1>
+  </div>
 
   <TabBar {tabs} let:tab bind:active={activeTab}>
     <Tab {tab}>
@@ -207,11 +209,6 @@
         </Card>
         <OptionCard option={voiceOption} />
       {:else}
-        <Snackbar bind:this={micPermissionGrantedSnackbar}>
-          <SnackbarLabel>
-            Great! You are all set! Just say "Hey Buddy" to start!
-          </SnackbarLabel>
-        </Snackbar>
         <OptionCard option={hotword} />
         <OptionCard option={tts} />
         <OptionCard option={shortcut} />

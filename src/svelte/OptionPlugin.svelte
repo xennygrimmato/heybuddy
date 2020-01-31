@@ -12,7 +12,7 @@
       0 2px 10px 0 rgba(0, 0, 0, 0.12);
     margin: 2px;
     flex-grow: 5;
-    width: calc(50% - 4px);
+    width: calc(33% - 4px);
     text-align: center;
   }
 </style>
