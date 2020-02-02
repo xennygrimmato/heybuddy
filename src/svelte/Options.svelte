@@ -95,34 +95,44 @@
     shortcut.enabled = !!shortcut.caption;
   });
 
-  storage.get(["customHotword", "tts", "hotword"], result => {
+  function markInitialized() {
+    storage.set({ hotword: true, init: true }, () => {
+      chrome.tabs.update({
+        url: "https://bewisse.com/heybuddy/thankyou/"
+      });
+    });
+  }
+
+  storage.get(["customHotword", "tts", "hotword", "init"], result => {
     customHotword = result.customHotword || "";
     tts.enabled = result.tts;
     hotword.enabled = result.hotword;
-  });
 
-  navigator.mediaDevices
-    .getUserMedia({ audio: true })
-    .then(stream => {
-      voiceOption.enabled = true;
-    })
-    .catch(error => {
-      voiceOption.enabled = false;
-      const intervalHandle = setInterval(async () => {
-        try {
-          const hasMicAccess = await navigator.mediaDevices.getUserMedia({
-            audio: true
-          });
-          voiceOption.enabled = true;
-          storage.set({ hotword: true }, () => {
-            chrome.tabs.update({
-              url: "https://bewisse.com/heybuddy/thankyou/"
+    navigator.mediaDevices
+      .getUserMedia({ audio: true })
+      .then(stream => {
+        voiceOption.enabled = true;
+        if (!result.init) {
+          markInitialized();
+        }
+      })
+      .catch(error => {
+        voiceOption.enabled = false;
+        const intervalHandle = setInterval(async () => {
+          try {
+            const hasMicAccess = await navigator.mediaDevices.getUserMedia({
+              audio: true
             });
-          });
-          clearInterval(intervalHandle);
-        } catch (ignored) {}
-      }, 1000);
-    });
+            voiceOption.enabled = true;
+            storage.set({ hotword: true });
+            if (!result.init) {
+              markInitialized();
+            }
+            clearInterval(intervalHandle);
+          } catch (ignored) {}
+        }, 1000);
+      });
+  });
 
   $: storage.set({ customHotword });
 </script>
