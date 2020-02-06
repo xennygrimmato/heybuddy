@@ -1,8 +1,8 @@
 import { storage } from "./common";
-import { allPlugins } from "./plugins/index";
+import { allPlugins, allGrammars } from "./plugins/index";
 import commander from "./commander";
 
-commander.init(allPlugins);
+commander.init(allPlugins, allGrammars);
 commander.startListeningToTriggerCommands();
 
 const setUpContextMenus = () => {

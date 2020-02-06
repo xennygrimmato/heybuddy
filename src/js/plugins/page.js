@@ -1,4 +1,3 @@
-import { mdiFileFind } from "@mdi/js";
 import commander from "../commander";
 
 const ZOOM_LEVEL = [
@@ -21,122 +20,104 @@ const ZOOM_LEVEL = [
   5
 ];
 
-const plugins = [
+const commands = [
   {
-    name: "Page control",
-    icon: mdiFileFind,
-    queries: [
-      "zoom in | make it larger",
-      "zoom out | make it smaller",
-      "reset zoom | make it normal size",
-      "find <text> | look for <text>",
-      "scroll down | page down",
-      "scroll up | page up",
-      "go to top | go to bottom"
-    ],
-    grammars: [
-      "#JSGF V1.0; grammar pages; public <page> = zoom in | zoom out | page up | page down | scroll up | scroll down"
-    ],
     commands: [
-      {
-        commands: [
-          "zoom in",
-          "zoom",
-          "enlarge",
-          "make (it) larger",
-          "make (it) bigger"
-        ],
-        callback: query => {
-          commander.getActiveTab(activeTab => {
-            chrome.tabs.getZoom(activeTab.id, zoomFactor => {
-              for (let zoomLevel of ZOOM_LEVEL) {
-                if (zoomFactor + 0.01 < zoomLevel) {
-                  chrome.tabs.setZoom(activeTab.id, zoomLevel);
-                  break;
-                }
-              }
-            });
-          });
-        }
-      },
+      "zoom in",
+      "zoom",
+      "enlarge",
+      "make (it) larger",
+      "make (it) bigger"
+    ],
+    callback: query => {
+      commander.getActiveTab(activeTab => {
+        chrome.tabs.getZoom(activeTab.id, zoomFactor => {
+          for (let zoomLevel of ZOOM_LEVEL) {
+            if (zoomFactor + 0.01 < zoomLevel) {
+              chrome.tabs.setZoom(activeTab.id, zoomLevel);
+              break;
+            }
+          }
+        });
+      });
+    }
+  },
 
-      {
-        commands: ["zoom out", "make (it) smaller"],
-        callback: query => {
-          commander.getActiveTab(activeTab => {
-            chrome.tabs.getZoom(activeTab.id, zoomFactor => {
-              for (let i = ZOOM_LEVEL.length - 1; i >= 0; i--) {
-                const zoomLevel = ZOOM_LEVEL[i];
-                if (zoomFactor - 0.01 > zoomLevel) {
-                  chrome.tabs.setZoom(activeTab.id, zoomLevel);
-                  break;
-                }
-              }
-            });
-          });
-        }
-      },
-      {
-        commands: ["reset zoom", "make (it) normal size"],
-        callback: query => {
-          commander.getActiveTab(activeTab => {
-            chrome.tabs.setZoom(activeTab.id, 1);
-          });
-        }
-      },
+  {
+    commands: ["zoom out", "make (it) smaller"],
+    callback: query => {
+      commander.getActiveTab(activeTab => {
+        chrome.tabs.getZoom(activeTab.id, zoomFactor => {
+          for (let i = ZOOM_LEVEL.length - 1; i >= 0; i--) {
+            const zoomLevel = ZOOM_LEVEL[i];
+            if (zoomFactor - 0.01 > zoomLevel) {
+              chrome.tabs.setZoom(activeTab.id, zoomLevel);
+              break;
+            }
+          }
+        });
+      });
+    }
+  },
+  {
+    commands: ["reset zoom", "make (it) normal size"],
+    callback: query => {
+      commander.getActiveTab(activeTab => {
+        chrome.tabs.setZoom(activeTab.id, 1);
+      });
+    }
+  },
 
-      {
-        commands: ["find *query", "look for *query"],
-        callback: query => {
-          commander.executeScripts(`window.find('${query}');`);
-        }
-      },
+  {
+    commands: ["find *query", "look for *query"],
+    callback: query => {
+      commander.executeScripts(`window.find('${query}');`);
+    }
+  },
 
-      {
-        commands: ["scroll down", "(go) down"],
-        callback: query => {
-          commander.executeScripts("window.scrollBy(0, 250);");
-        }
-      },
+  {
+    commands: ["scroll down", "(go) down"],
+    callback: query => {
+      commander.executeScripts("window.scrollBy(0, 250);");
+    }
+  },
 
-      {
-        commands: ["page down"],
-        callback: query => {
-          commander.executeScripts("window.scrollBy(0, 1000);");
-        }
-      },
+  {
+    commands: ["page down"],
+    callback: query => {
+      commander.executeScripts("window.scrollBy(0, 1000);");
+    }
+  },
 
-      {
-        commands: ["scroll up", "(go) up"],
-        callback: query => {
-          commander.executeScripts("window.scrollBy(0, -250);");
-        }
-      },
+  {
+    commands: ["scroll up", "(go) up"],
+    callback: query => {
+      commander.executeScripts("window.scrollBy(0, -250);");
+    }
+  },
 
-      {
-        commands: ["page up"],
-        callback: query => {
-          commander.executeScripts("window.scrollBy(0, -1000);");
-        }
-      },
+  {
+    commands: ["page up"],
+    callback: query => {
+      commander.executeScripts("window.scrollBy(0, -1000);");
+    }
+  },
 
-      {
-        commands: ["go to (the) top", "scroll to (the) top"],
-        callback: query => {
-          commander.executeScripts("window.scrollTo(0, 0);");
-        }
-      },
+  {
+    commands: ["go to (the) top", "scroll to (the) top"],
+    callback: query => {
+      commander.executeScripts("window.scrollTo(0, 0);");
+    }
+  },
 
-      {
-        commands: ["go to (the) bottom", "scroll to (the) bottom"],
-        callback: query => {
-          commander.executeScripts(
-            "window.scrollTo(0, document.body.scrollHeight);"
-          );
-        }
-      }
-    ]
+  {
+    commands: ["go to (the) bottom", "scroll to (the) bottom"],
+    callback: query => {
+      commander.executeScripts(
+        "window.scrollTo(0, document.body.scrollHeight);"
+      );
+    }
   }
 ];
 
-export default plugins;
+export default commands;

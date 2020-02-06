@@ -11,17 +11,15 @@ const DEFAULT_COMMAND_PRIORITY = 0.5;
 
 class Commander {
   /** ------- Initialization ------- */
-  init(allPlugins) {
+  init(allPlugins, allGrammars) {
     if (DEBUG) {
       annyang.debug(true);
     }
     annyang.addGrammars(
       "#JSGF V1.0; grammar triggers; public <trigger> = hey buddy;"
     );
-    for (const plugin of allPlugins) {
-      if (plugin.grammars) {
-        annyang.addGrammars(plugin.grammars);
-      }
+    for (const grammars of allGrammars) {
+      annyang.addGrammars(grammars);
     }
 
     this.notificationManager_ = new NotificationManager();
@@ -325,18 +323,16 @@ class Commander {
     this.regularCommands_ = {};
     this.commandsWithTrigger_ = {};
 
-    for (const plugin of this.allPlugins_) {
-      for (const command of plugin.commands) {
-        if (DEBUG) {
-          const keys = Object.keys(command);
-          if (!keys.includes("commands") || !keys.includes("callback")) {
-            console.error(`Invalid command in plugin: `, command);
-          }
+    for (const command of this.allPlugins_) {
+      if (DEBUG) {
+        const keys = Object.keys(command);
+        if (!keys.includes("commands") || !keys.includes("callback")) {
+          console.error(`Invalid command in plugin: `, command);
         }
-        this.addCommands(command.commands, command.callback, {
-          priority: command.priority || DEFAULT_COMMAND_PRIORITY
-        });
       }
+      this.addCommands(command.commands, command.callback, {
+        priority: command.priority || DEFAULT_COMMAND_PRIORITY
+      });
     }
   }
 }

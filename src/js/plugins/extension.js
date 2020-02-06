@@ -1,41 +1,24 @@
-import { mdiMicrophone, mdiPencil } from "@mdi/js";
 import commander from "../commander";
 
-const plugins = [
+const commands = [
   {
-    name: "Voice assistant",
-    icon: mdiMicrophone,
-    queries: [
-      "bye | good bye | close",
-      "see supported commands",
-      "what can you do"
-    ],
-    commands: [
-      {
-        commands: ["bye", "bye bye", "goodbye", "good bye", "close"],
-        callback: () => {
-          commander.clearNotifications();
-        }
-      },
-      {
-        commands: ["see supported commands", "what can you do"],
-        callback: () => {
-          commander.openTabWithUrl(
-            chrome.runtime.getURL("/options.html?tab=1")
-          );
-        }
-      }
-    ]
+    commands: ["bye", "bye bye", "goodbye", "good bye", "close"],
+    callback: () => {
+      commander.clearNotifications();
+    }
   },
   {
-    name: "Voice input",
-    icon: mdiPencil,
-    queries: ["write <something to write>", "submit | enter"],
-    commands: [
-      {
-        commands: ["submit", "enter"],
-        callback: () => {
-          commander.executeScripts(`
+    commands: ["see supported commands", "what can you do"],
+    callback: () => {
+      commander.openTabWithUrl(
+        chrome.runtime.getURL("/options.html?tab=1")
+      );
+    }
+  },
+  {
+    commands: ["submit", "enter"],
+    callback: () => {
+      commander.executeScripts(`
           const focusedElement = document.activeElement;
           if (focusedElement.form) {
             focusedElement.form.submit();
@@ -48,13 +31,13 @@ const plugins = [
             }));
           }
         `);
-        }
-      },
-      {
-        commands: ["write *query"],
-        callback: query => {
-          query = query.replace("'", "\\'");
-          commander.executeScripts(`
+    }
+  },
+  {
+    commands: ["write *query"],
+    callback: query => {
+      query = query.replace("'", "\\'");
+      commander.executeScripts(`
           const focusedElement = document.activeElement;
           const tagName = focusedElement.tagName.toLowerCase();
           const contenteditable = focusedElement.getAttribute('contenteditable') != '';
@@ -87,10 +70,8 @@ const plugins = [
             }
           }
         `);
-        }
-      }
-    ]
+    }
   }
 ];
 
-export default plugins;
+export default commands;

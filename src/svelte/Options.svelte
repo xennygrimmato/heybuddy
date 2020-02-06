@@ -19,7 +19,7 @@
   import OptionCard from "./OptionCard.svelte";
   import OptionPlugin from "./OptionPlugin.svelte";
   import { DEBUG, ICON_COLOR, storage } from "../js/common";
-  import { allPlugins } from "../js/plugins";
+  import { plugins } from "../js/sample_queries";
 
   let tabs = ["Options", "Supported commands"];
   const tabIndex = new URL(window.location).searchParams.get("tab") || 0;
@@ -250,7 +250,7 @@
     <div
       class="flex-container transition-container"
       transition:fly={{ x: 200 }}>
-      {#each allPlugins as plugin}
+      {#each plugins as plugin}
         <OptionPlugin {plugin} />
       {/each}
     </div>

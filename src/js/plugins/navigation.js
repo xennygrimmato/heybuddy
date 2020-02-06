@@ -1,43 +1,35 @@
-import { mdiArrowRight } from "@mdi/js";
 import commander from "../commander";
 
-const plugins = [
+const commands = [
   {
-    name: "Navigation",
-    icon: mdiArrowRight,
-    queries: ["go back", "go forward", "reload | refresh"],
+    commands: ["go back"],
+    callback: query => {
+      commander.executeScripts("window.history.back();");
+    }
+  },
+
+  {
+    commands: ["go forward"],
+    callback: query => {
+      commander.executeScripts("window.history.forward();");
+    }
+  },
+
+  {
     commands: [
-      {
-        commands: ["go back"],
-        callback: query => {
-          commander.executeScripts("window.history.back();");
-        }
-      },
-
-      {
-        commands: ["go forward"],
-        callback: query => {
-          commander.executeScripts("window.history.forward();");
-        }
-      },
-
-      {
-        commands: [
-          "reload",
-          "reload tab",
-          "reload this tab",
-          "reload the tab",
-          "refresh",
-          "refresh tab",
-          "refresh this tab",
-          "refresh the tab"
-        ],
-        callback: () => {
-          chrome.tabs.reload({});
-        }
-      }
-    ]
+      "reload",
+      "reload tab",
+      "reload this tab",
+      "reload the tab",
+      "refresh",
+      "refresh tab",
+      "refresh this tab",
+      "refresh the tab"
+    ],
+    callback: () => {
+      chrome.tabs.reload({});
+    }
   }
 ];
 
-export default plugins;
+export default commands;

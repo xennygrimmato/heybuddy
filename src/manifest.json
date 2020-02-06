@@ -9,7 +9,9 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "scripts": ["background.bundle.js"]
+    "scripts": [
+      "background.bundle.js"
+    ]
   },
   "icons": {
     "16": "img/icon_16.png",
@@ -22,8 +24,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["contents_iframe.bundle.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "contents_iframe.bundle.js"
+      ],
       "run_at": "document_idle"
     }
   ],
@@ -48,6 +54,8 @@
     "notification_ui.html",
     "img/*"
   ],
-  "optional_permissions": ["bookmarks"],
+  "optional_permissions": [
+    "bookmarks"
+  ],
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
