@@ -6,8 +6,12 @@
 <h3 align="center">
   <a href="https://bewisse.com/heybuddy/">
   <img src="https://static.bewisse.com/heybuddy/icon_full.png" width="48px" alt="Hey Buddy" />
-   Hey Buddy
-   </a>
+  </a>
+  <a href="https://bewisse.com/heybuddy/">
+
+    Hey Buddy Official Website
+
+  </a>
 </h3>
 
 ## Features
