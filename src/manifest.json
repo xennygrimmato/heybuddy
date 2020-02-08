@@ -1,6 +1,7 @@
 {
   "name": "Hey Buddy - Chrome Voice Assistant",
   "version": "2.0.1",
+  "short_name": "Hey Buddy",
   "manifest_version": 2,
   "description": "Use voice commands to control your Chrome browser",
   "browser_action": {
