@@ -1,19 +1,14 @@
-# Hey Buddy - Chrome Voice Assistant browser extension
+# Hey Buddy - Chrome Voice Assistant
 
 <h3 align="center">
-  Hey Buddy - Chrome Voice Assistant is a browser extension that allow you to use voice to control  your browser.
+  Hey Buddy is a browser extension that allow you to use voice to control  your browser.
 </h3>
 <h3 align="center">
-  <img src="https://static.bewisse.com/heybuddy/logo_2x.png" width="24px" alt="Hey Buddy - Chrome Voice Assistant" />
   <a href="https://bewisse.com/heybuddy/">
-    Official Website
-  </a>
+  <img src="https://static.bewisse.com/heybuddy/icon_full.png" width="48px" alt="Hey Buddy" />
+   Hey Buddy
+   </a>
 </h3>
-<p align="center">
-  <a href="https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem">
-    <img src="https://static.bewisse.com/chrome_1x.png" srcset="https://static.bewisse.com/chrome_2x.png 2x">
-  </a>
-</p>
 
 ## Features
 
@@ -25,7 +20,11 @@
 
 ## Screenshots
 
-<img src="https://static.bewisse.com/heybuddy/screenshot1.png">
+<img src="https://static.bewisse.com/heybuddy/heybuddy-screenshot1.png">
+
+<img src="https://static.bewisse.com/heybuddy/heybuddy-screenshot2.png">
+
+<img src="https://static.bewisse.com/heybuddy/heybuddy-screenshot3.png">
 
 ## Forking and contribution
 
@@ -35,7 +34,8 @@ You may fork and redistribute Hey Buddy for a small group of friends / colleague
 
 ## Installation
 
-Run: `npm run install`, then `npm run start`. This will create a build/ directory with the extension artifacts.
+Run: `npm run install` , then `npm run start` . This will create a build/ directory with the extension artifacts.
 Simply load the build/ directory into chrome://extensions.
 
-For production build, run `npm run build`.
+For production build, run `npm run build` .
+
