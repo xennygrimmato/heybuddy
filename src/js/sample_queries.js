@@ -24,6 +24,7 @@ const plugins = [
     queries: [
       "close tab",
       "close other tabs | close all tabs",
+      "close tabs to the left | close tabs to the right",
       "pin tab | unpin tab",
       "mute | unmute",
       "maximize window | minimize window",
