@@ -39,7 +39,7 @@ const siteToUrl = {
   Bing: "https://www.bing.com/search?q=",
   AOL: "https://search.aol.com/aol/search?q=",
   Yahoo: "https://search.yahoo.com/search?p=",
-  Amazon: "https://www.amazon.com/s/?field-keywords=",
+  Amazon: "https://www.amazon.com/s?tag=bewisse-20&k=",
   Walmart: "https://www.walmart.com/search/?query=",
   Target: "https://www.target.com/s?searchTerm=",
   YouTube: "https://www.youtube.com/results?search_query=",
@@ -194,7 +194,7 @@ const commands = [
   {
     commands: ["shopping", "buy something"],
     callback: () => {
-      commander.openTabWithUrl("https://www.amazon.com/");
+      commander.openTabWithUrl("https://www.amazon.com/?tag=bewisse-20");
     }
   },
   {
@@ -206,7 +206,7 @@ const commands = [
     ],
     callback: query => {
       commander.openTabWithUrl(
-        "https://www.amazon.com/s/field-keywords=" + query
+        "https://www.amazon.com/s?tag=bewisse-20&k=" + query
       );
     }
   },

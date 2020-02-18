@@ -7,6 +7,7 @@
     mdiKeyboard,
     mdiTextToSpeech,
     mdiContactMail,
+    mdiEarHearing,
     mdiThumbUp
   } from "@mdi/js";
   import Card, { Content } from "@smui/card";
@@ -66,6 +67,20 @@
     }
   };
 
+  let autoOff = {
+    icon: mdiEarHearing,
+    title: "Stay listening",
+    caption:
+      'After a query is issued, stay listening for another 15 seconds without having to say "Hey Buddy" again. ' +
+      'After 15 seconds of silence, the "Hey Buddy" will stop listening. It can also be stopped by pressing the ' +
+      '"X" button.',
+    errorCaption:
+      '"Hey Buddy" will stop listening after each query. Trigger it by saying the hotword or by clicking on the icon.',
+    onClick: enabled => {
+      storage.set({ autoOff: !enabled });
+    }
+  };
+
   let shortcut = {
     icon: mdiKeyboard,
     title: "Keyboard shortcut",
@@ -103,36 +118,40 @@
     });
   }
 
-  storage.get(["customHotword", "tts", "hotword", "init"], result => {
-    customHotword = result.customHotword || "";
-    tts.enabled = result.tts;
-    hotword.enabled = result.hotword;
+  storage.get(
+    ["customHotword", "tts", "hotword", "autoOff", "init"],
+    result => {
+      customHotword = result.customHotword || "";
+      tts.enabled = result.tts;
+      hotword.enabled = result.hotword;
+      autoOff.enabled = !result.autoOff;
 
-    navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then(stream => {
-        voiceOption.enabled = true;
-        if (!result.init) {
-          markInitialized();
-        }
-      })
-      .catch(error => {
-        voiceOption.enabled = false;
-        const intervalHandle = setInterval(async () => {
-          try {
-            const hasMicAccess = await navigator.mediaDevices.getUserMedia({
-              audio: true
-            });
-            voiceOption.enabled = true;
-            storage.set({ hotword: true });
-            if (!result.init) {
-              markInitialized();
-            }
-            clearInterval(intervalHandle);
-          } catch (ignored) {}
-        }, 1000);
-      });
-  });
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then(stream => {
+          voiceOption.enabled = true;
+          if (!result.init) {
+            markInitialized();
+          }
+        })
+        .catch(error => {
+          voiceOption.enabled = false;
+          const intervalHandle = setInterval(async () => {
+            try {
+              const hasMicAccess = await navigator.mediaDevices.getUserMedia({
+                audio: true
+              });
+              voiceOption.enabled = true;
+              storage.set({ hotword: true });
+              if (!result.init) {
+                markInitialized();
+              }
+              clearInterval(intervalHandle);
+            } catch (ignored) {}
+          }, 1000);
+        });
+    }
+  );
 
   $: storage.set({ customHotword });
 </script>
@@ -221,6 +240,7 @@
       {:else}
         <OptionCard option={hotword} />
         <OptionCard option={tts} />
+        <OptionCard option={autoOff} />
         <OptionCard option={shortcut} />
         <Card class="card">
           <Content>

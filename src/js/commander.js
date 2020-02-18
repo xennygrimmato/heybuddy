@@ -297,7 +297,10 @@ class Commander {
       if (this.regularCommands_[command]) {
         console.error(`${command} has already been added`);
       }
-      this.regularCommands_[command] = commandFunction;
+      this.regularCommands_[command] = (arg0, arg1, arg2) => {
+        commandFunction(arg0, arg1, arg2);
+        this.autoCloseIfNeeded();
+      };
       this.commandPriorities_[command] = priority;
 
       // Combine the individual commands with triggering commands, allowing the user
@@ -305,13 +308,14 @@ class Commander {
       for (let triggerKey in this.triggerCommands_) {
         const triggerAndCommand = triggerKey + " " + command;
         this.commandPriorities_[triggerAndCommand] = priority;
-        this.commandsWithTrigger_[triggerAndCommand] = query => {
+        this.commandsWithTrigger_[triggerAndCommand] = (arg0, arg1, arg2) => {
           this.trigger();
           this.performActionWithDelay(() => {
             this.sendResultMessage(
               this.lastCommand_.replace(triggerKey, "").trim()
             );
-            commandFunction(query);
+            commandFunction(arg0, arg1, arg2);
+            this.autoCloseIfNeeded();
           });
         };
       }
@@ -335,6 +339,19 @@ class Commander {
       });
     }
   }
+
+  autoCloseIfNeeded() {
+    console.log('autoCloseIfNeeded');
+    this.performActionWithDelay(() => {
+      chrome.storage.local.get(["autoOff"], result => {
+        console.log('autoOff: ' + result.autoOff);
+        if (result.autoOff) {
+          commander.clearNotifications();
+        }
+      });
+    })
+  }
+
 }
 
 const commander = new Commander();
