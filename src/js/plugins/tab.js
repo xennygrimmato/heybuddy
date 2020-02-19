@@ -33,7 +33,8 @@ const commands = [
       "close other tab",
       "close other tabs",
       "close the other tab",
-      "close the other tabs"
+      "close the other tabs",
+      "close all (tabs) but this (tab)"
     ],
     callback: () => {
       chrome.tabs.query(
@@ -234,7 +235,51 @@ const commands = [
       });
     }
   },
-
+  {
+    commands: ["side by side"],
+    callback: () => {
+      chrome.tabs.query({}, (tabs => {
+        if (tabs.length >= 2) {
+          tabs.sort((a, b) => {
+            if (a.currentWindow && a.active) {
+              return -1;
+            }
+            if (b.currentWindow && b.active) {
+              return 1;
+            }
+            return b.index - a.index
+          });
+          const screen = window.screen;
+          const tabA = tabs[0];
+          const tabB = tabs[1];
+          if (tabA.windowId === tabB.windowId) {
+            chrome.windows.create({
+              tabId: tabB.id,
+              left: Math.ceil(screen.availWidth / 2),
+              top: 0,
+              width: screen.availWidth / 2,
+              height: screen.availHeight
+            })
+          } else {
+            chrome.windows.update(tabB.windowId, {
+              left: Math.ceil(screen.availWidth / 2),
+              top: 0,
+              width: screen.availWidth / 2,
+              height: screen.availHeight
+            });
+          }
+          
+          chrome.windows.update(tabA.windowId, {
+            left: 0,
+            top: 0,
+            width: Math.ceil(screen.availWidth / 2),
+            height: screen.availHeight,
+            focused: true
+          });
+        }
+      }))
+    }
+  },
   {
     commands: [
       "fullscreen",

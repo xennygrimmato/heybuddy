@@ -16,6 +16,12 @@ const commands = [
     }
   },
   {
+    commands: ["*query no", "*query cancel", "*query stop"],
+    callback: () => {
+      
+    }
+  },
+  {
     commands: ["submit", "enter"],
     callback: () => {
       commander.executeScripts(`
