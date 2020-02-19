@@ -11,7 +11,11 @@ const commands = [
     }
   },
   {
-    commands: ["close tab", "close this tab", "close the tab"],
+    commands: [
+      "close tab",
+      "close this tab",
+      "close the tab",
+    ],
     callback: () => {
       commander.performActionWithDelay(() => {
         chrome.tabs.query(

@@ -222,11 +222,11 @@
       recognition.grammars = speechRecognitionList;
 
       // Set the max number of alternative transcripts to try and match with a command
-      recognition.maxAlternatives = 10;
+      recognition.maxAlternatives = 5;
 
       // In HTTPS, turn off continuous mode for faster results.
       // In HTTP,  turn on  continuous mode for much slower results, but no repeating security notices
-      recognition.continuous = root.location.protocol === "http:";
+      recognition.continuous = true;
 
       recognition.interimResults = true;
 
