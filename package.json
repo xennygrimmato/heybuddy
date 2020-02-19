@@ -10,8 +10,6 @@
     "@material/typography": "^4.0.0",
     "@mdi/js": "^4.8.95",
     "@smui/card": "^1.0.0-beta.19",
-    "@smui/tab": "^1.0.0-beta.19",
-    "@smui/tab-bar": "^1.0.0-beta.19",
     "@smui/textfield": "^1.0.0-beta.19",
     "axios": "^0.19.2",
     "cheerio": "^1.0.0-rc.3",

@@ -10,9 +10,7 @@ const commands = [
   {
     commands: ["see supported commands", "what can you do"],
     callback: () => {
-      commander.openTabWithUrl(
-        chrome.runtime.getURL("/options.html?tab=1")
-      );
+      commander.openTabWithUrl("https://bewisse.com/heybuddy/commands/");
     }
   },
   {

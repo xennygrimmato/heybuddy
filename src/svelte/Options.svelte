@@ -8,23 +8,17 @@
     mdiTextToSpeech,
     mdiContactMail,
     mdiEarHearing,
+    mdiViewList,
     mdiThumbUp
   } from "@mdi/js";
   import Card, { Content } from "@smui/card";
   import Textfield from "@smui/textfield";
-  import Tab, { Icon, Label as TabLabel } from "@smui/tab";
-  import TabBar from "@smui/tab-bar";
   import Button, { Label } from "@smui/button";
   import { fly } from "svelte/transition";
   import MdiIcon from "./MdiIcon.svelte";
   import OptionCard from "./OptionCard.svelte";
-  import OptionPlugin from "./OptionPlugin.svelte";
   import { DEBUG, ICON_COLOR, storage } from "../js/common";
-  import { plugins } from "../js/sample_queries";
 
-  let tabs = ["Options", "Supported commands"];
-  const tabIndex = new URL(window.location).searchParams.get("tab") || 0;
-  let activeTab = tabs[tabIndex];
   let customHotword = "";
 
   let voiceOption = {
@@ -182,11 +176,6 @@
     vertical-align: middle;
   }
 
-  .flex-container {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
   .transition-container {
     position: absolute;
     width: 800px;
@@ -202,6 +191,12 @@
     </Button>
   </h1>
   <div>
+    <Button href="https://bewisse.com/heybuddy/commands/" target="_blank">
+      <MdiIcon size="24" icon={mdiViewList} color={ICON_COLOR} />
+      &nbsp;
+      <Label color={ICON_COLOR}>All commands</Label>
+    </Button>
+    &nbsp;
     <Button
       href="https://chrome.google.com/webstore/detail/chrome-voice-assistant/aollofiafbblhopkofbfmlmbhbdcblem"
       target="_blank">
@@ -217,62 +212,45 @@
     </Button>
   </div>
 
-  <TabBar {tabs} let:tab bind:active={activeTab}>
-    <Tab {tab}>
-      <Label>{tab}</Label>
-    </Tab>
-  </TabBar>
-  {#if activeTab === tabs[0]}
-    <div class="transition-container" transition:fly={{ x: -200 }}>
-      {#if !voiceOption.enabled}
-        <Card class="card">
-          <Content>
-            <div class="mdc-typography--subtitle1">
-              🎉 Thank you for installing Hey Buddy 🎉
-            </div>
-            <div class="mdc-typography--subtitle2">
-              We just need one more permission from you to access your
-              microphone
-            </div>
-          </Content>
-        </Card>
-        <OptionCard option={voiceOption} />
-      {:else}
-        <OptionCard option={hotword} />
-        <OptionCard option={tts} />
-        <OptionCard option={autoOff} />
-        <OptionCard option={shortcut} />
-        <Card class="card">
-          <Content>
-            <div class="mdc-typography--subtitle1">Hotwords</div>
-            <div class="mdc-typography--caption">
-              Say one of these hotwords to trigger Hey Buddy by voice.
-            </div>
-            <Textfield
-              variant="filled"
-              disabled
-              class="hotword-input"
-              value="Hey Buddy (default and cannot be changed)"
-              input$readonly
-              input$aria-readonly />
-            <Textfield
-              variant="outlined"
-              class="hotword-input"
-              input$placeholder="Set custom hotword"
-              bind:value={customHotword}
-              input$minlength="5" />
-          </Content>
-        </Card>
-      {/if}
-    </div>
-  {/if}
-  {#if activeTab === tabs[1]}
-    <div
-      class="flex-container transition-container"
-      transition:fly={{ x: 200 }}>
-      {#each plugins as plugin}
-        <OptionPlugin {plugin} />
-      {/each}
-    </div>
-  {/if}
+  <div class="transition-container" transition:fly={{ x: -200 }}>
+    {#if !voiceOption.enabled}
+      <Card class="card">
+        <Content>
+          <div class="mdc-typography--subtitle1">
+            🎉 Thank you for installing Hey Buddy 🎉
+          </div>
+          <div class="mdc-typography--subtitle2">
+            We just need one more permission from you to access your microphone
+          </div>
+        </Content>
+      </Card>
+      <OptionCard option={voiceOption} />
+    {:else}
+      <OptionCard option={hotword} />
+      <OptionCard option={tts} />
+      <OptionCard option={autoOff} />
+      <OptionCard option={shortcut} />
+      <Card class="card">
+        <Content>
+          <div class="mdc-typography--subtitle1">Hotwords</div>
+          <div class="mdc-typography--caption">
+            Say one of these hotwords to trigger Hey Buddy by voice.
+          </div>
+          <Textfield
+            variant="filled"
+            disabled
+            class="hotword-input"
+            value="Hey Buddy (default and cannot be changed)"
+            input$readonly
+            input$aria-readonly />
+          <Textfield
+            variant="outlined"
+            class="hotword-input"
+            input$placeholder="Set custom hotword"
+            bind:value={customHotword}
+            input$minlength="5" />
+        </Content>
+      </Card>
+    {/if}
+  </div>
 </div>
