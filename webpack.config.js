@@ -31,6 +31,7 @@ if (fileSystem.existsSync(secretsPath)) {
 
 var options = {
   mode: env.NODE_ENV,
+  devtool: 'source-map',
   entry: {
     popup: path.join(__dirname, "src", "js", "popup.js"),
     options: path.join(__dirname, "src", "js", "options.js"),
