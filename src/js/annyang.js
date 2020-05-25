@@ -296,8 +296,8 @@
         }
 
         // Map the results to an array
-        var SpeechRecognitionResult = event.results[event.resultIndex];
-        var results = [];
+        const SpeechRecognitionResult = event.results[event.resultIndex];
+        const results = [];
         for (let k = 0; k < SpeechRecognitionResult.length; k++) {
           results[k] = SpeechRecognitionResult[k].transcript;
         }
