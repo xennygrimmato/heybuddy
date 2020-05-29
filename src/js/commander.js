@@ -99,16 +99,6 @@ class Commander {
         });
       }
     });
-
-    if (DEBUG) {
-      annyang.addCallback("start", () => {
-        console.log("start");
-      });
-
-      annyang.addCallback("end", () => {
-        console.log("end");
-      });
-    }
     updateBrowserAction(false);
   }
 
@@ -341,10 +331,8 @@ class Commander {
   }
 
   autoCloseIfNeeded() {
-    console.log('autoCloseIfNeeded');
     this.performActionWithDelay(() => {
       chrome.storage.local.get(["autoOff"], result => {
-        console.log('autoOff: ' + result.autoOff);
         if (result.autoOff) {
           commander.clearNotifications();
         }
