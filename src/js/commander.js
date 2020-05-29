@@ -22,7 +22,7 @@ class Commander {
       annyang.addGrammars(grammars);
     }
 
-    this.notificationManager_ = new NotificationManager();
+    this.notificationManager_ = new NotificationManager(this);
     this.allPlugins_ = allPlugins;
     this.lastCommand_ = "";
     this.commandPriorities_ = {};
@@ -60,9 +60,7 @@ class Commander {
       if (result && result.hotword) {
         annyang.start();
       } else {
-        if (annyang.isListening()) {
-          annyang.abort();
-        }
+        annyang.abort();
       }
     });
 
@@ -150,9 +148,7 @@ class Commander {
     }
     storage.get(["hotword"], result => {
       if (!result.hotword) {
-        if (annyang.isListening()) {
-          annyang.abort();
-        }
+        annyang.abort();
       }
     });
   }

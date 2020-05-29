@@ -4,8 +4,9 @@ import { updateBrowserAction } from "./browser_actions";
 const NOTIFICATION_TIMEOUT = 15000; 
 
 export default class NotificationManager {
-  constructor() {
+  constructor(commander) {
     this.lastData_ = undefined;
+    this.commander_ = commander;
   }
 
   hasMessage() {
@@ -25,7 +26,7 @@ export default class NotificationManager {
     await this.innerSendMessage(request);
     setTimeout(() => {
       if (this.lastData_ === request) {
-        this.clearMessage();
+        this.commander_.clearNotifications();
       }
     }, NOTIFICATION_TIMEOUT);
   }

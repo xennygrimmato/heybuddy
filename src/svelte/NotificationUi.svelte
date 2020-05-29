@@ -9,8 +9,8 @@
     mdiRepeat,
     mdiShieldCheck,
     mdiTabRemove,
-    mdiThumbUp,
-    mdiViewList
+    mdiThumbUpOutline,
+    mdiHelpCircleOutline
   } from "@mdi/js";
 
   const PREDEFINED_COMMANDS = new Set(["close tab", "best result"]);
@@ -201,16 +201,16 @@
     in:scale={{ easing: elasticOut, duration: 500 }}
     out:scale={{ duration: 200 }}>
     <div class="chrome-voice-assistant-options-icons">
+      <svg width="24" height="24" viewBox="0 0 24 24" on:click={sendFeedback}>
+        <path fill="#666" d={mdiThumbUpOutline} />
+      </svg>
       <svg
         width="24"
         height="24"
         xmlns="http://www.w3.org/2000/svg"
         on:click={seeAllCommands}
         viewBox="0 0 24 24">
-        <path fill="#666" d={mdiViewList} />
-      </svg>
-      <svg width="24" height="24" viewBox="0 0 24 24" on:click={sendFeedback}>
-        <path fill="#666" d={mdiThumbUp} />
+        <path fill="#666" d={mdiHelpCircleOutline} />
       </svg>
       <svg width="24" height="24" on:click={viewOptions} viewBox="0 0 24 24">
         <path fill="#666" d={mdiCogOutline} />

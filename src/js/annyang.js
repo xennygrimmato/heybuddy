@@ -377,7 +377,7 @@
       autoRestart = false;
       autoRestartCount = 0;
       if (isInitialized()) {
-        recognition.abort();
+        recognition.stop();
       }
     },
 
