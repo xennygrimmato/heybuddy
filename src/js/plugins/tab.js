@@ -1,11 +1,11 @@
-import commander from "../commander";
+import { performActionWithDelay } from './core';
 
 const commands = [
   {
     /** ------- Tab management commands ------- */
     commands: ["open new tab"],
     callback: () => {
-      commander.performActionWithDelay(() => {
+      performActionWithDelay(() => {
         chrome.tabs.create({});
       });
     }
@@ -17,7 +17,7 @@ const commands = [
       "close the tab",
     ],
     callback: () => {
-      commander.performActionWithDelay(() => {
+      performActionWithDelay(() => {
         chrome.tabs.query(
           {
             active: true
@@ -102,7 +102,7 @@ const commands = [
       "exit window"
     ],
     callback: () => {
-      commander.performActionWithDelay(() => {
+      performActionWithDelay(() => {
         chrome.windows.getCurrent({}, window => {
           chrome.windows.remove(window.id);
         });

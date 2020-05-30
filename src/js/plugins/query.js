@@ -2,6 +2,7 @@ import cheerio from "cheerio";
 import axios from "axios";
 import commander from "../commander";
 import { activeListening } from '../store';
+import { performActionWithDelay } from './core';
 
 /** ------- Search query ------- */
 const prependQueryPhrase = queries => {
@@ -117,7 +118,7 @@ const commands = [
       "directions from *from to *to"
     ]),
     callback: (from, to) => {
-      commander.performActionWithDelay(() => {
+      performActionWithDelay(() => {
         commander.openTabWithUrl(
           "https://www.google.com/maps/dir/" + from + "/" + to
         );

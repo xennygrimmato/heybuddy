@@ -2,6 +2,7 @@ import annyang from "./annyang";
 import { DEBUG, storage } from "./common";
 import NotificationManager from "./notification";
 import { activeListening } from './store';
+import { performActionWithDelay } from './core';
 
 function getHost(url) {
   return new URL(url).host;
@@ -152,18 +153,6 @@ class Commander {
   }
 
   /** ------- Helper functions to perform actions ------- */
-  async performAction(action) {
-    if (this.notificationManager_.hasMessage()) {
-      action();
-    }
-  }
-
-  performActionWithDelay(action) {
-    setTimeout(() => {
-      this.performAction(action);
-    }, 100);
-  }
-
   requestPermissions(
     permissions,
     originalMessage,
@@ -284,7 +273,7 @@ class Commander {
         this.commandPriorities_[triggerAndCommand] = priority;
         this.commandsWithTrigger_[triggerAndCommand] = (arg0, arg1, arg2) => {
           this.trigger();
-          this.performActionWithDelay(() => {
+          performActionWithDelay(() => {
             this.sendResultMessage(
               this.lastCommand_.replace(triggerKey, "").trim()
             );
@@ -315,7 +304,7 @@ class Commander {
   }
 
   autoCloseIfNeeded() {
-    this.performActionWithDelay(() => {
+    performActionWithDelay(() => {
       chrome.storage.local.get(["autoOff"], result => {
         if (result.autoOff) {
           activeListening.set(false);
