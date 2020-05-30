@@ -1,4 +1,6 @@
-export function updateBrowserAction(enabled) {
+import { activeListening } from './store';
+
+activeListening.subscribe(enabled => {
   if (enabled) {
     chrome.browserAction.setIcon({
       path: "/img/icon_128.png"
@@ -8,4 +10,4 @@ export function updateBrowserAction(enabled) {
       path: "/img/icon_128_bw.png"
     });
   }
-}
+});

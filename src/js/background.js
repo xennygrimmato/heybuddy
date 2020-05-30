@@ -1,6 +1,8 @@
 import { storage } from "./common";
 import { allPlugins, allGrammars } from "./plugins/index";
 import commander from "./commander";
+import "./browser_actions";
+import "./tab_muter";
 
 commander.init(allPlugins, allGrammars);
 commander.startListeningToTriggerCommands();

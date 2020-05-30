@@ -1,7 +1,6 @@
 import annyang from "./annyang";
 import { DEBUG, storage } from "./common";
 import NotificationManager from "./notification";
-import { updateBrowserAction } from "./browser_actions";
 import { activeListening } from './store';
 
 function getHost(url) {
@@ -29,10 +28,18 @@ class Commander {
     this.commandPriorities_ = {};
 
     activeListening.subscribe(value => {
+      if (DEBUG) {
+        console.log("Active listening: ", value);
+      }
       if (value) {
-        this.startListeningToAllCommands();
+        for (const key in this.regularCommands_) {
+          annyang.addCommands(
+            { [key]: this.regularCommands_[key] },
+            this.commandPriorities_[key]
+          );
+        }
       } else {
-        this.clearNotifications();
+        this.startListeningToTriggerCommands();
       }
     });
 
@@ -104,40 +111,6 @@ class Commander {
           title: "Listening",
           content: result
         });
-      }
-    });
-    updateBrowserAction(false);
-  }
-
-  clearNotifications() {
-    chrome.tabs.query({ muted: true }, (tabs) => {
-      for (const tab of tabs) {
-        if (tab.mutedInfo.extensionId === chrome.runtime.id) {
-          chrome.tabs.update(tab.id, { muted: false });
-        }
-      }
-    });
-    this.startListeningToTriggerCommands();
-  }
-
-  startListeningToAllCommands() {
-    chrome.tabs.query({ audible: true }, (tabs) => {
-      for (const tab of tabs) {
-        chrome.tabs.update(tab.id, { muted: true });
-      }
-    });
-    updateBrowserAction(true);
-    this.performActionWithDelay(() => {
-      if (this.notificationManager_.hasMessage()) {
-        if (DEBUG) {
-          console.log("Listening to all commands");
-        }
-        for (const key in this.regularCommands_) {
-          annyang.addCommands(
-            { [key]: this.regularCommands_[key] },
-            this.commandPriorities_[key]
-          );
-        }
       }
     });
   }
