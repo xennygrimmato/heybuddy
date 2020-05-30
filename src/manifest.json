@@ -1,6 +1,6 @@
 {
   "name": "Hey Buddy - Chrome Voice Assistant",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "short_name": "Hey Buddy",
   "manifest_version": 2,
   "description": "Speech recognition and voice control for Chrome",
@@ -10,9 +10,7 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "scripts": [
-      "background.bundle.js"
-    ]
+    "scripts": ["background.bundle.js"]
   },
   "icons": {
     "16": "img/icon_16.png",
@@ -25,12 +23,8 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
-      "js": [
-        "contents_iframe.bundle.js"
-      ],
+      "matches": ["<all_urls>"],
+      "js": ["contents_iframe.bundle.js"],
       "run_at": "document_idle"
     }
   ],
@@ -45,18 +39,8 @@
     }
   },
   "incognito": "spanning",
-  "permissions": [
-    "<all_urls>",
-    "activeTab",
-    "contextMenus",
-    "storage"
-  ],
-  "web_accessible_resources": [
-    "notification_ui.html",
-    "img/*"
-  ],
-  "optional_permissions": [
-    "bookmarks"
-  ],
+  "permissions": ["<all_urls>", "activeTab", "contextMenus", "storage"],
+  "web_accessible_resources": ["notification_ui.html", "img/*"],
+  "optional_permissions": ["bookmarks"],
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }
