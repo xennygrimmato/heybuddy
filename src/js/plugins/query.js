@@ -1,6 +1,7 @@
-import commander from "../commander";
 import cheerio from "cheerio";
 import axios from "axios";
+import commander from "../commander";
+import { activeListening } from '../store';
 
 /** ------- Search query ------- */
 const prependQueryPhrase = queries => {
@@ -272,7 +273,7 @@ const commands = [
             "https://www.google.com/search?gs_ivs=1&q=" +
             encodeURIComponent(query)
           );
-          commander.clearNotifications();
+          activeListening.set(false);
         } else {
           commander.openTabWithUrl(
             "https://www.google.com/search?q=" +

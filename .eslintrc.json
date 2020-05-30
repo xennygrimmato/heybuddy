@@ -1,7 +1,7 @@
 {
   "extends": "eslint:recommended",
   "parser": "babel-eslint",
-  "parserOptions": {
-    "sourceType": "module"
+  "rules": {
+    "no-undef": 0
   }
 }

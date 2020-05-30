@@ -1,12 +1,23 @@
 import { DEBUG } from "./common";
 import { updateBrowserAction } from "./browser_actions";
+import { activeListening } from './store';
 
 const NOTIFICATION_TIMEOUT = 15000; 
 
 export default class NotificationManager {
-  constructor(commander) {
+  constructor() {
     this.lastData_ = undefined;
-    this.commander_ = commander;
+    activeListening.subscribe(value => {
+      if (value) {
+        this.sendMessage({
+          type: "START_LISTENING",
+          title: "Listening",
+          content: "Hi, how can I help you?"
+        });
+      } else {
+        this.clearMessage();
+      }
+    });
   }
 
   hasMessage() {
@@ -26,7 +37,7 @@ export default class NotificationManager {
     await this.innerSendMessage(request);
     setTimeout(() => {
       if (this.lastData_ === request) {
-        this.commander_.clearNotifications();
+        activeListening.set(false);
       }
     }, NOTIFICATION_TIMEOUT);
   }

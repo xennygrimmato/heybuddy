@@ -2,6 +2,7 @@ import annyang from "./annyang";
 import { DEBUG, storage } from "./common";
 import NotificationManager from "./notification";
 import { updateBrowserAction } from "./browser_actions";
+import { activeListening } from './store';
 
 function getHost(url) {
   return new URL(url).host;
@@ -22,16 +23,24 @@ class Commander {
       annyang.addGrammars(grammars);
     }
 
-    this.notificationManager_ = new NotificationManager(this);
+    this.notificationManager_ = new NotificationManager();
     this.allPlugins_ = allPlugins;
     this.lastCommand_ = "";
     this.commandPriorities_ = {};
 
-    chrome.tabs.onActivated.addListener(activeInfo => {
+    activeListening.subscribe(value => {
+      if (value) {
+        this.startListeningToAllCommands();
+      } else {
+        this.clearNotifications();
+      }
+    });
+
+    chrome.tabs.onActivated.addListener(() => {
       this.notificationManager_.resendMessageIfAvailable();
     });
 
-    chrome.runtime.onMessage.addListener(async (request, sender) => {
+    chrome.runtime.onMessage.addListener(async (request) => {
       if (DEBUG) {
         console.log(`Received message: ${JSON.stringify(request)}`);
       }
@@ -48,7 +57,7 @@ class Commander {
           annyang.trigger(request.query);
           break;
         case "CLEAR_NOTIFICATION":
-          this.clearNotifications();
+          activeListening.set(false);
           break;
         case "TAB_LOADED":
           this.notificationManager_.resendMessageIfAvailable();
@@ -101,15 +110,21 @@ class Commander {
   }
 
   clearNotifications() {
+    chrome.tabs.query({ muted: true }, (tabs) => {
+      for (const tab of tabs) {
+        if (tab.mutedInfo.extensionId === chrome.runtime.id) {
+          chrome.tabs.update(tab.id, { muted: false });
+        }
+      }
+    });
     this.startListeningToTriggerCommands();
-    this.notificationManager_.clearMessage();
   }
 
   startListeningToAllCommands() {
-    this.notificationManager_.sendMessage({
-      type: "START_LISTENING",
-      title: "Listening",
-      content: "Hi, how can I help you?"
+    chrome.tabs.query({ audible: true }, (tabs) => {
+      for (const tab of tabs) {
+        chrome.tabs.update(tab.id, { muted: true });
+      }
     });
     updateBrowserAction(true);
     this.performActionWithDelay(() => {
@@ -243,11 +258,11 @@ class Commander {
     this.getActiveTab(activeTab => {
       if (!activeTab.url || activeTab.url.startsWith("chrome")) {
         // We can't use content script on chrome URLs, so need to create a new tab.
-        chrome.tabs.create({ url: "https://www.google.com" }, () =>
-          this.startListeningToAllCommands()
-        );
+        chrome.tabs.create({ url: "https://www.google.com" }, () => {
+          activeListening.set(true);
+        });
       } else {
-        this.startListeningToAllCommands();
+        activeListening.set(true);
       }
     });
   }
@@ -330,7 +345,7 @@ class Commander {
     this.performActionWithDelay(() => {
       chrome.storage.local.get(["autoOff"], result => {
         if (result.autoOff) {
-          commander.clearNotifications();
+          activeListening.set(false);
         }
       });
     })

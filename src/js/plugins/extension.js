@@ -1,10 +1,11 @@
 import commander from "../commander";
+import { activeListening } from '../store';
 
 const commands = [
   {
     commands: ["bye", "bye bye", "goodbye", "good bye", "close"],
     callback: () => {
-      commander.clearNotifications();
+      activeListening.set(false);
     }
   },
   {
