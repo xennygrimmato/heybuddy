@@ -2,66 +2,88 @@ import { DEBUG } from "./common";
 import { getActiveTab } from './core';
 import { activeListening } from './store';
 
-const NOTIFICATION_TIMEOUT = 15000; 
+const NOTIFICATION_TIMEOUT = 15000;
+let lastData = undefined;
 
-export default class NotificationManager {
-  constructor() {
-    this.lastData_ = undefined;
-    activeListening.subscribe(value => {
-      if (value) {
-        this.sendMessage({
-          type: "START_LISTENING",
-          title: "Listening",
-          content: "Hi, how can I help you?"
-        });
+activeListening.subscribe(value => {
+  if (value) {
+    sendMessage({
+      type: "START_LISTENING",
+      title: "Listening",
+      content: "Hi, how can I help you?"
+    });
+  } else {
+    clearMessage();
+  }
+});
+
+export async function hasMessage() {
+  return lastData !== null;
+}
+
+function clearMessage() {
+  lastData = null;
+  return innerSendMessage({
+    type: "CLEAR_NOTIFICATION"
+  });
+}
+
+export async function sendMessage(request) {
+  lastData = request;
+  await innerSendMessage(request);
+  setTimeout(() => {
+    if (lastData === request) {
+      activeListening.set(false);
+    }
+  }, NOTIFICATION_TIMEOUT);
+}
+
+export async function resendMessageIfAvailable() {
+  if (lastData) {
+    await innerSendMessage(lastData);
+  } else {
+    await clearMessage();
+  }
+}
+
+async function innerSendMessage(request) {
+  if (DEBUG) {
+    console.log(`Sending request: ${JSON.stringify(request)}`);
+  }
+  chrome.runtime.sendMessage(request);
+  try {
+    const activeTab = await getActiveTab();
+    // Cannot send message to chrome URLs.
+    if (activeTab.url && !activeTab.url.startsWith("chrome")) {
+      chrome.tabs.sendMessage(activeTab.id, request);
+    }
+  } catch (err) {
+    console.log(`Ignoring tab notification. Error: ${err}`);
+  }
+}
+
+export function sendPermissionRequest(
+  permissions,
+  originalMessage,
+  requestPermissionMessage,
+  callback
+) {
+  chrome.permissions.request(
+    {
+      permissions: permissions
+    },
+    granted => {
+      if (granted) {
+        callback();
       } else {
-        this.clearMessage();
+        sendMessage({
+          type: "PERMISSION_REQUEST",
+          title: "Permission needed",
+          content: requestPermissionMessage,
+          originalMessage,
+          permissions
+        });
       }
-    });
-  }
-
-  hasMessage() {
-    return this.lastData_ !== null;
-  }
-
-  clearMessage() {
-    this.lastData_ = null;
-    return this.innerSendMessage({
-      type: "CLEAR_NOTIFICATION"
-    });
-  }
-
-  async sendMessage(request) {
-    this.lastData_ = request;
-    await this.innerSendMessage(request);
-    setTimeout(() => {
-      if (this.lastData_ === request) {
-        activeListening.set(false);
-      }
-    }, NOTIFICATION_TIMEOUT);
-  }
-
-  async resendMessageIfAvailable() {
-    if (this.lastData_) {
-      await this.innerSendMessage(this.lastData_);
-    } else {
-      await this.clearMessage();
     }
-  }
-
-  async innerSendMessage(request) {
-    if (DEBUG) {
-      console.log(`Sending request: ${JSON.stringify(request)}`);
-    }
-    chrome.runtime.sendMessage(request);
-    try {
-      const activeTab = await getActiveTab();
-      // Cannot send message to chrome URLs.
-      if (activeTab.url && !activeTab.url.startsWith("chrome")) {
-        chrome.tabs.sendMessage(activeTab.id, request);
-      }
-    } catch (err) {
-      console.log(`Ignoring tab notification. Error: ${err}`);
-    }
-  }
+  );
 }

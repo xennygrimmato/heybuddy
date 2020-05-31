@@ -1,4 +1,4 @@
-import commander from "../commander";
+import { sendPermissionRequest } from "../notification";
 import { getActiveTab } from '../core';
 
 const commands = [
@@ -17,7 +17,7 @@ const commands = [
         });
       };
       if (!chrome.bookmarks) {
-        commander.requestPermissions(
+        sendPermissionRequest(
           ["bookmarks"],
           "bookmark",
           "Hey Buddy needs permission to manage your bookmarks.",
@@ -49,7 +49,7 @@ const commands = [
         );
       };
       if (!chrome.bookmarks) {
-        commander.requestPermissions(
+        sendPermissionRequest(
           ["bookmarks"],
           "remove bookmark",
           "Hey Buddy needs permission to manage your bookmarks.",

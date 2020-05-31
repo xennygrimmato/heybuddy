@@ -1,6 +1,6 @@
 import annyang from "./annyang";
 import { DEBUG, storage } from "./common";
-import NotificationManager from "./notification";
+import { hasMessage, sendMessage, resendMessageIfAvailable } from "./notification";
 import { activeListening } from './store';
 import { getActiveTab, performActionWithDelay } from './core';
 
@@ -19,7 +19,6 @@ class Commander {
       annyang.addGrammars(grammars);
     }
 
-    this.notificationManager_ = new NotificationManager();
     this.allPlugins_ = allPlugins;
     this.lastCommand_ = "";
     this.commandPriorities_ = {};
@@ -41,7 +40,7 @@ class Commander {
     });
 
     chrome.tabs.onActivated.addListener(() => {
-      this.notificationManager_.resendMessageIfAvailable();
+      resendMessageIfAvailable();
     });
 
     chrome.runtime.onMessage.addListener(async (request) => {
@@ -64,7 +63,7 @@ class Commander {
           activeListening.set(false);
           break;
         case "TAB_LOADED":
-          this.notificationManager_.resendMessageIfAvailable();
+          resendMessageIfAvailable();
           break;
       }
     });
@@ -82,7 +81,7 @@ class Commander {
       if (hotword) {
         if (hotword.newValue) {
           annyang.start();
-        } else if (!this.notificationManager_.hasMessage()) {
+        } else if (!hasMessage()) {
           annyang.abort();
         }
       }
@@ -102,8 +101,8 @@ class Commander {
 
     annyang.addCallback("result", results => {
       const result = results[0];
-      if (result && this.notificationManager_.hasMessage()) {
-        this.notificationManager_.sendMessage({
+      if (result && hasMessage()) {
+        sendMessage({
           type: "PENDING_RESULT",
           title: "Listening",
           content: result
@@ -139,8 +138,8 @@ class Commander {
   }
 
   sendResultMessage(userSaid) {
-    if (this.notificationManager_.hasMessage()) {
-      this.notificationManager_.sendMessage({
+    if (hasMessage()) {
+      sendMessage({
         type: "RESULT",
         title: "Received command",
         content: userSaid
@@ -149,32 +148,6 @@ class Commander {
   }
 
   /** ------- Helper functions to perform actions ------- */
-  requestPermissions(
-    permissions,
-    originalMessage,
-    requestPermissionMessage,
-    callback
-  ) {
-    chrome.permissions.request(
-      {
-        permissions: permissions
-      },
-      granted => {
-        if (granted) {
-          callback();
-        } else {
-          this.notificationManager_.sendMessage({
-            type: "PERMISSION_REQUEST",
-            title: "Permission needed",
-            content: requestPermissionMessage,
-            originalMessage,
-            permissions
-          });
-        }
-      }
-    );
-  }
-
   async trigger() {
     const activeTab = await getActiveTab();
     if (!activeTab.url || activeTab.url.startsWith("chrome")) {
@@ -226,7 +199,7 @@ class Commander {
 
       // Combine the individual commands with triggering commands, allowing the user
       // to trigger an action with the triggering hotword prefix.
-      for (let triggerKey in this.triggerCommands_) {
+      for (const triggerKey in this.triggerCommands_) {
         const triggerAndCommand = triggerKey + " " + command;
         this.commandPriorities_[triggerAndCommand] = priority;
         this.commandsWithTrigger_[triggerAndCommand] = (arg0, arg1, arg2) => {

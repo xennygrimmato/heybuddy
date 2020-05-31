@@ -31,7 +31,7 @@ export function getActiveTab() {
 }
 
 export async function executeScripts(code) {
-  const activeTab = await this.getActiveTab();
+  const activeTab = await getActiveTab();
   chrome.tabs.executeScript(activeTab.id, {
     code: `(function() { ${code} })();`,
     allFrames: true
@@ -39,7 +39,7 @@ export async function executeScripts(code) {
 }
 
 export async function openTabWithUrl(url) {
-  const activeTab = await this.getActiveTab();
+  const activeTab = await getActiveTab();
   const activeTabUrl = activeTab.url;
   if (
     !activeTabUrl ||
@@ -48,6 +48,6 @@ export async function openTabWithUrl(url) {
   ) {
     chrome.tabs.update(activeTab.id, { url: url });
   } else {
-    chrome.tabs.create({ url: url, windowId: this.activeWindowId_ });
+    chrome.tabs.create({ url: url });
   }
 }
