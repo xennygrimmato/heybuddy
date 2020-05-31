@@ -1,4 +1,4 @@
-import commander from "../commander";
+import { executeScripts } from '../core';
 
 const selectResultScript = `
 function getElementByXpath(path) {
@@ -25,15 +25,15 @@ function selectResult(index) {
 const commands = [
   {
     commands: ["go back"],
-    callback: query => {
-      commander.executeScripts("window.history.back();");
+    callback: () => {
+      executeScripts("window.history.back();");
     }
   },
 
   {
     commands: ["go forward"],
-    callback: query => {
-      commander.executeScripts("window.history.forward();");
+    callback: () => {
+      executeScripts("window.history.forward();");
     }
   },
 
@@ -82,7 +82,7 @@ for (const wordToIndex of wordToIndices) {
   commands.push({
       commands: words,
       callback: () => {
-        commander.executeScripts(selectResultScript + `selectResult(${wordToIndex.index});`)
+        executeScripts(selectResultScript + `selectResult(${wordToIndex.index});`)
       }
     });
 }

@@ -2,11 +2,7 @@ import annyang from "./annyang";
 import { DEBUG, storage } from "./common";
 import NotificationManager from "./notification";
 import { activeListening } from './store';
-import { performActionWithDelay } from './core';
-
-function getHost(url) {
-  return new URL(url).host;
-}
+import { getActiveTab, performActionWithDelay } from './core';
 
 const DEFAULT_COMMAND_PRIORITY = 0.5;
 
@@ -179,54 +175,16 @@ class Commander {
     );
   }
 
-  getActiveTab(callback) {
-    chrome.tabs.query(
-      {
-        active: true
-      },
-      tabs => {
-        if (tabs.length > 0) {
-          callback(tabs[0]);
-        }
-      }
-    );
-  }
-
-  executeScripts(code) {
-    this.getActiveTab(activeTab => {
-      chrome.tabs.executeScript(activeTab.id, {
-        code: `(function() { ${code} })();`,
-        allFrames: true
-      });
-    });
-  }
-
-  openTabWithUrl(url) {
-    this.getActiveTab(activeTab => {
-      const activeTabUrl = activeTab.url;
-      if (
-        !activeTabUrl ||
-        activeTabUrl == "chrome://newtab/" ||
-        getHost(activeTabUrl) == getHost(url)
-      ) {
-        chrome.tabs.update(activeTab.id, { url: url });
-      } else {
-        chrome.tabs.create({ url: url, windowId: this.activeWindowId_ });
-      }
-    });
-  }
-
-  trigger() {
-    this.getActiveTab(activeTab => {
-      if (!activeTab.url || activeTab.url.startsWith("chrome")) {
-        // We can't use content script on chrome URLs, so need to create a new tab.
-        chrome.tabs.create({ url: "https://www.google.com" }, () => {
-          activeListening.set(true);
-        });
-      } else {
+  async trigger() {
+    const activeTab = await getActiveTab();
+    if (!activeTab.url || activeTab.url.startsWith("chrome")) {
+      // We can't use content script on chrome URLs, so need to create a new tab.
+      chrome.tabs.create({ url: "https://www.google.com" }, () => {
         activeListening.set(true);
-      }
-    });
+      });
+    } else {
+      activeListening.set(true);
+    }
   }
 
   /** ------- Handle Triggering commands ------- */

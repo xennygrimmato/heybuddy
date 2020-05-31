@@ -1,4 +1,5 @@
 import { DEBUG } from "./common";
+import { getActiveTab } from './core';
 import { activeListening } from './store';
 
 const NOTIFICATION_TIMEOUT = 15000; 
@@ -54,31 +55,13 @@ export default class NotificationManager {
     }
     chrome.runtime.sendMessage(request);
     try {
-      const activeTab = await this.getActiveTab();
-      chrome.tabs.sendMessage(activeTab.id, request);
+      const activeTab = await getActiveTab();
+      // Cannot send message to chrome URLs.
+      if (activeTab.url && !activeTab.url.startsWith("chrome")) {
+        chrome.tabs.sendMessage(activeTab.id, request);
+      }
     } catch (err) {
       console.log(`Ignoring tab notification. Error: ${err}`);
     }
-  }
-
-  getActiveTab() {
-    return new Promise((resolve, reject) => {
-      chrome.tabs.query(
-        {
-          active: true
-        },
-        tabs => {
-          if (tabs.length > 0) {
-            const activeTab = tabs[0];
-            // Cannot send message to chrome URLs.
-            if (activeTab.url && !activeTab.url.startsWith("chrome")) {
-              resolve(activeTab);
-              return;
-            }
-          }
-          reject("No active tab found.");
-        }
-      );
-    });
   }
 }

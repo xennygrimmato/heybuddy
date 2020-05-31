@@ -1,4 +1,4 @@
-import { performActionWithDelay } from './core';
+import { performActionWithDelay } from '../core';
 
 const commands = [
   {

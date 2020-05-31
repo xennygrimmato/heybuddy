@@ -1,4 +1,4 @@
-import commander from "../commander";
+import { executeScripts } from '../core';
 
 function forAllVideos(perVideoCommand) {
   return (
@@ -22,7 +22,7 @@ const commands = [
   {
     commands: ["pause", "stop"],
     callback: () => {
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.pause();") + forAllAudios("audio.pause();")
       );
     }
@@ -31,7 +31,7 @@ const commands = [
   {
     commands: ["play", "resume"],
     callback: () => {
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.play();") + forAllAudios("audio.play();")
       );
     }
@@ -40,7 +40,7 @@ const commands = [
   {
     commands: ["increase volume", "volume up"],
     callback: () => {
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.volume = Math.min(1, video.volume + .2);") +
         forAllAudios("audio.volume = Math.min(1, audio.volume + .2);")
       );
@@ -50,7 +50,7 @@ const commands = [
   {
     commands: ["decrease volume", "volume down"],
     callback: () => {
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.volume = Math.max(0, video.volume - .2);") +
         forAllAudios("audio.volume = Math.max(0, audio.volume - .2);")
       );
@@ -60,7 +60,7 @@ const commands = [
   {
     commands: ["(make it) loud"],
     callback: () => {
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.volume = .8;") +
         forAllAudios("audio.volume = .8;")
       );
@@ -70,7 +70,7 @@ const commands = [
   {
     commands: ["(make it) very loud"],
     callback: () => {
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.volume = 1;") +
         forAllAudios("audio.volume = 1;")
       );
@@ -80,7 +80,7 @@ const commands = [
   {
     commands: ["(make it) quiet"],
     callback: () => {
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.volume = .2;") +
         forAllAudios("audio.volume = .2;")
       );
@@ -94,7 +94,7 @@ const commands = [
       if (!(seconds > 0)) {
         seconds = 10;
       }
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.currentTime += " + seconds + ";") +
         forAllAudios("audio.currentTime += " + seconds + ";")
       );
@@ -108,7 +108,7 @@ const commands = [
       if (!(seconds > 0)) {
         seconds = 10;
       }
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.currentTime -= " + seconds + ";") +
         forAllAudios("audio.currentTime -= " + seconds + ";")
       );
@@ -123,7 +123,7 @@ const commands = [
         minutes = 1;
       }
       let seconds = minutes * 60;
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.currentTime += " + seconds + ";") +
         forAllAudios("audio.currentTime += " + seconds + ";")
       );
@@ -138,7 +138,7 @@ const commands = [
         minutes = 1;
       }
       let seconds = minutes * 60;
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.currentTime -= " + seconds + ";") +
         forAllAudios("audio.currentTime -= " + seconds + ";")
       );
@@ -156,7 +156,7 @@ const commands = [
     ],
     callback: () => {
       let seconds = 60;
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.currentTime += " + seconds + ";") +
         forAllAudios("audio.currentTime += " + seconds + ";")
       );
@@ -171,7 +171,7 @@ const commands = [
     ],
     callback: () => {
       let seconds = 60;
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.currentTime -= " + seconds + ";") +
         forAllAudios("audio.currentTime -= " + seconds + ";")
       );
@@ -181,7 +181,7 @@ const commands = [
   {
     commands: ["(go) back to (the) beginning"],
     callback: () => {
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.currentTime = 0;") +
         forAllAudios("audio.currentTime = 0;")
       );
@@ -191,7 +191,7 @@ const commands = [
   {
     commands: ["(go) to (the) end"],
     callback: () => {
-      commander.executeScripts(
+      executeScripts(
         forAllVideos("video.currentTime = video.duration;") +
         forAllAudios("audio.currentTime = audio.duration;")
       );

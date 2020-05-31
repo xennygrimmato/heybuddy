@@ -1,4 +1,5 @@
 import commander from "../commander";
+import { getActiveTab } from '../core';
 
 const commands = [
   {
@@ -8,12 +9,11 @@ const commands = [
       "add (this) (page) (to) bookmark"
     ],
     callback: () => {
-      const bookmarkHandler = () => {
-        commander.getActiveTab(activeTab => {
-          chrome.bookmarks.create({
-            title: activeTab.title,
-            url: activeTab.url
-          });
+      const bookmarkHandler = async () => {
+        const activeTab = await getActiveTab();
+        chrome.bookmarks.create({
+          title: activeTab.title,
+          url: activeTab.url
         });
       };
       if (!chrome.bookmarks) {
@@ -35,19 +35,18 @@ const commands = [
       "remove the bookmark"
     ],
     callback: () => {
-      const unbookmarkHandler = () => {
-        commander.getActiveTab(activeTab => {
-          chrome.bookmarks.search(
-            {
-              url: activeTab.url
-            },
-            results => {
-              if (results.length > 0) {
-                chrome.bookmarks.remove(results[0].id);
-              }
+      const unbookmarkHandler = async () => {
+        const activeTab = await getActiveTab();
+        chrome.bookmarks.search(
+          {
+            url: activeTab.url
+          },
+          results => {
+            if (results.length > 0) {
+              chrome.bookmarks.remove(results[0].id);
             }
-          );
-        });
+          }
+        );
       };
       if (!chrome.bookmarks) {
         commander.requestPermissions(

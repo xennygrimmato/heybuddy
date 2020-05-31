@@ -1,8 +1,7 @@
 import cheerio from "cheerio";
 import axios from "axios";
-import commander from "../commander";
 import { activeListening } from '../store';
-import { performActionWithDelay } from './core';
+import { openTabWithUrl, performActionWithDelay } from '../core';
 
 /** ------- Search query ------- */
 const prependQueryPhrase = queries => {
@@ -59,7 +58,7 @@ for (const key in siteToUrl) {
       "*query at " + key
     ],
     callback: query => {
-      commander.openTabWithUrl(siteToUrl[key] + query);
+      openTabWithUrl(siteToUrl[key] + query);
     },
     priority: 0.3
   });
@@ -76,7 +75,7 @@ const commands = [
       "pictures of *query"
     ]),
     callback: query => {
-      commander.openTabWithUrl(
+      openTabWithUrl(
         "https://www.google.com/search?tbm=isch&q=" + query
       );
     }
@@ -84,7 +83,7 @@ const commands = [
   {
     commands: prependQueryPhrase(["news of *query", "news about *query"]),
     callback: query => {
-      commander.openTabWithUrl(
+      openTabWithUrl(
         "https://www.google.com/search?tbm=nws&q=" + query
       );
     }
@@ -97,7 +96,7 @@ const commands = [
       "today's news"
     ]),
     callback: () => {
-      commander.openTabWithUrl("https://news.google.com/");
+      openTabWithUrl("https://news.google.com/");
     }
   },
   {
@@ -108,7 +107,7 @@ const commands = [
       "how do I get to *query"
     ]),
     callback: query => {
-      commander.openTabWithUrl("https://www.google.com/maps?q=" + query);
+      openTabWithUrl("https://www.google.com/maps?q=" + query);
     }
   },
 
@@ -119,7 +118,7 @@ const commands = [
     ]),
     callback: (from, to) => {
       performActionWithDelay(() => {
-        commander.openTabWithUrl(
+        openTabWithUrl(
           "https://www.google.com/maps/dir/" + from + "/" + to
         );
       });
@@ -132,7 +131,7 @@ const commands = [
       "directions from *query"
     ]),
     callback: query => {
-      commander.openTabWithUrl("https://www.google.com/maps/dir/" + query);
+      openTabWithUrl("https://www.google.com/maps/dir/" + query);
     }
   },
 
@@ -142,13 +141,13 @@ const commands = [
       "directions to *query"
     ]),
     callback: query => {
-      commander.openTabWithUrl("https://www.google.com/maps/dir//" + query);
+      openTabWithUrl("https://www.google.com/maps/dir//" + query);
     }
   },
   {
     commands: ["wikipedia"],
     callback: () => {
-      commander.openTabWithUrl("https://wikipedia.org/");
+      openTabWithUrl("https://wikipedia.org/");
     }
   },
   {
@@ -160,7 +159,7 @@ const commands = [
       "wikipedia *query"
     ],
     callback: query => {
-      commander.openTabWithUrl(
+      openTabWithUrl(
         "https://en.wikipedia.org/wiki/Special:Search/" + query
       );
     }
@@ -168,7 +167,7 @@ const commands = [
   {
     commands: ["play video", "video", "play videos", "videos"],
     callback: () => {
-      commander.openTabWithUrl("https://www.youtube.com/");
+      openTabWithUrl("https://www.youtube.com/");
     }
   },
   {
@@ -182,7 +181,7 @@ const commands = [
       "watch *query"
     ]),
     callback: query => {
-      commander.openTabWithUrl(
+      openTabWithUrl(
         "https://www.youtube.com/results?search_query=" + query
       );
     }
@@ -190,13 +189,13 @@ const commands = [
   {
     commands: ["play music", "music"],
     callback: () => {
-      commander.openTabWithUrl("https://play.google.com/music/listen");
+      openTabWithUrl("https://play.google.com/music/listen");
     }
   },
   {
     commands: ["shopping", "buy something"],
     callback: () => {
-      commander.openTabWithUrl("https://www.amazon.com/?tag=bewisse-20");
+      openTabWithUrl("https://www.amazon.com/?tag=bewisse-20");
     }
   },
   {
@@ -207,7 +206,7 @@ const commands = [
       "buy *query"
     ],
     callback: query => {
-      commander.openTabWithUrl(
+      openTabWithUrl(
         "https://www.amazon.com/s?tag=bewisse-20&k=" + query
       );
     }
@@ -220,7 +219,7 @@ const commands = [
       "open downloads"
     ],
     callback: query => {
-      commander.openTabWithUrl("chrome://downloads");
+      openTabWithUrl("chrome://downloads");
     }
   },
 
@@ -232,21 +231,21 @@ const commands = [
       "open bookmarks"
     ],
     callback: query => {
-      commander.openTabWithUrl("chrome://bookmarks");
+      openTabWithUrl("chrome://bookmarks");
     }
   },
 
   {
     commands: ["go to history", "open history"],
     callback: query => {
-      commander.openTabWithUrl("chrome://history");
+      openTabWithUrl("chrome://history");
     }
   },
 
   {
     commands: ["go to *query", "open *query"],
     callback: async query => {
-      commander.openTabWithUrl(await generateGoogleLuckyUrl(query));
+      openTabWithUrl(await generateGoogleLuckyUrl(query));
     }
   },
   ...searchCommands,
@@ -258,7 +257,7 @@ const commands = [
       "*query at *site"
     ],
     callback: async (query, site) => {
-      commander.openTabWithUrl(
+      openTabWithUrl(
         await generateGoogleLuckyUrl(query + " on " + site)
       );
     },
@@ -270,13 +269,13 @@ const commands = [
       chrome.storage.local.get(["tts"], result => {
         // If TTS is enabled, we need to clear notifications to avoid the TTS to feedback into the command.
         if (result.tts) {
-          commander.openTabWithUrl(
+          openTabWithUrl(
             "https://www.google.com/search?gs_ivs=1&q=" +
             encodeURIComponent(query)
           );
           activeListening.set(false);
         } else {
-          commander.openTabWithUrl(
+          openTabWithUrl(
             "https://www.google.com/search?q=" +
             encodeURIComponent(query)
           );
