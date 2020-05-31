@@ -17,6 +17,10 @@ activeListening.subscribe(value => {
   }
 });
 
+chrome.tabs.onActivated.addListener(() => {
+  resendMessageIfAvailable();
+});
+
 export async function hasMessage() {
   return lastData !== null;
 }

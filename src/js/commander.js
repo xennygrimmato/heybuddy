@@ -39,10 +39,6 @@ class Commander {
       }
     });
 
-    chrome.tabs.onActivated.addListener(() => {
-      resendMessageIfAvailable();
-    });
-
     chrome.runtime.onMessage.addListener(async (request) => {
       if (DEBUG) {
         console.log(`Received message: ${JSON.stringify(request)}`);
