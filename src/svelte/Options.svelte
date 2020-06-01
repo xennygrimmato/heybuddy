@@ -6,7 +6,7 @@
     mdiPencil,
     mdiKeyboard,
     mdiTextToSpeech,
-    mdiContactMail,
+    mdiEmail,
     mdiEarHearing,
     mdiViewList,
     mdiThumbUp
@@ -206,7 +206,7 @@
     </Button>
     &nbsp;
     <Button href="https://bewisse.com/contact/" target="_blank">
-      <MdiIcon size="24" icon={mdiContactMail} color={ICON_COLOR} />
+      <MdiIcon size="24" icon={mdiEmail} color={ICON_COLOR} />
       &nbsp;
       <Label color={ICON_COLOR}>Contact us!</Label>
     </Button>
