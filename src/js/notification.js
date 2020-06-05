@@ -4,10 +4,8 @@ import { activeListening } from './store';
 
 const NOTIFICATION_TIMEOUT = 15000;
 let lastData = undefined;
-let isActiveListening = false;
 
 activeListening.subscribe(value => {
-  isActiveListening = value;
   if (value) {
     sendMessage({
       type: "START_LISTENING",
@@ -22,10 +20,6 @@ activeListening.subscribe(value => {
 chrome.tabs.onActivated.addListener(() => {
   resendMessageIfAvailable();
 });
-
-export function hasMessage() {
-  return isActiveListening;
-}
 
 function clearMessage() {
   lastData = null;

@@ -1,11 +1,10 @@
-import { allPlugins, allGrammars } from "./plugins/index";
-import commander from "./commander";
+import { allPlugins } from "./plugins/index";
+import { initCommander } from "./commander";
 import { initContextMenus } from "./context_menu";
 import { initBrowserAction } from "./browser_actions";
 import { initTabMuteListener } from "./tab_muter";
 
-commander.init(allPlugins, allGrammars);
-commander.startListeningToTriggerCommands();
+initCommander(allPlugins);
 initBrowserAction();
 initContextMenus();
 initTabMuteListener();

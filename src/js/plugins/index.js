@@ -16,12 +16,6 @@ const allPlugins = [
   ...query,
 ];
 
-const allGrammars = [
-  "#JSGF V1.0; grammar pages; public <page> = zoom in | zoom out | page up | page down | scroll up | scroll down",
-  "#JSGF V1.0; grammar tabs; public <tab> = close tab | close other tabs | close all tabs;"
-]
-
 export {
   allPlugins,
-  allGrammars,
 };

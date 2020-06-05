@@ -5,6 +5,9 @@
 //! license : MIT
 //! https://www.TalAter.com/annyang/
 
+import { DEBUG } from './common';
+import { getHotwords, isActiveListening, speechRecognitionEnabled } from './store';
+
 // Get the SpeechRecognition object, while handling browser prefixes
 const SpeechRecognition =
   window.SpeechRecognition ||
@@ -20,7 +23,6 @@ const SpeechGrammarList =
   oSpeechGrammarList;
 
 let commandsList = [];
-let grammarsList = [];
 let recognition;
 let callbacks = {
   start: [],
@@ -30,6 +32,7 @@ let callbacks = {
   result: [],
   resultMatch: [],
   resultNoMatch: [],
+  hotwordTrigger: [],
   errorNetwork: [],
   errorPermissionBlocked: [],
   errorPermissionDenied: []
@@ -37,10 +40,15 @@ let callbacks = {
 let autoRestart;
 let lastStartedAt = 0;
 let autoRestartCount = 0;
-let debugState = false;
+let debugState = DEBUG;
 let debugStyle = "font-weight: bold; color: #00f;";
 let pauseListening = false;
 let isListening = false;
+const allGrammars = [
+  '#JSGF V1.0; grammar pages; public <page> = zoom in | zoom out | page up | page down | scroll up | scroll down',
+  '#JSGF V1.0; grammar tabs; public <tab> = close tab | close other tabs | close all tabs;',
+  '#JSGF V1.0; grammar triggers; public <trigger> = hey buddy;'
+];
 
 // The command matching code is a modified version of Backbone.Router by Jeremy Ashkenas, under the MIT license.
 let optionalParam = /\s*\((.*?)\)\s*/g;
@@ -91,22 +99,42 @@ let registerCommand = function(command, callback, originalPhrase, priority) {
 };
 
 let parseResults = function(results, isFinal) {
+  
+  let hotwordTriggered = false;
+  results = results.map(result => result.trim().toLowerCase());
+  const hotwords = getHotwords();
+  for (const i in results) {
+    const result = results[i];
+    // the text recognized
+    if (debugState) {
+      logMessage("Speech recognized: %c" + result, debugStyle);
+    }
+    for (const hotword of hotwords) {
+      if (result === hotword) {
+        invokeCallbacks(callbacks.hotwordTrigger);
+        return;
+      }
+      if (result.startsWith(`${hotword} `)) {
+        if (!hotwordTriggered) {
+          hotwordTriggered = true;
+          invokeCallbacks(callbacks.hotwordTrigger);
+        }
+        results[i] = result.slice(`${hotword} `.length);
+      }
+    }
+  }
+  if (!hotwordTriggered && !isActiveListening()) {
+    return;
+  }
   if (!isFinal) {
     invokeCallbacks(callbacks.result, results);
     return;
   }
-  let commandText;
   let bestMatchCommand = null;
   let bestCommandText;
   let bestCommandParameters;
   // go over each of the 5 results and alternative results received (we've set maxAlternatives to 5 above)
-  for (let i = 0; i < results.length; i++) {
-    // the text recognized
-    commandText = results[i].trim().toLowerCase();
-    if (debugState) {
-      logMessage("Speech recognized: %c" + commandText, debugStyle);
-    }
-
+  for (const commandText of results) {
     // try and match recognized text to one of the commands on the list
     for (const currentCommand of commandsList) {
       let result = currentCommand.command.exec(commandText);
@@ -130,6 +158,9 @@ let parseResults = function(results, isFinal) {
     }
   }
   if (bestMatchCommand) {
+    if (DEBUG) {
+      console.log(`ResultMatch: ${bestCommandText}`);
+    }
     invokeCallbacks(
       callbacks.resultMatch,
       bestCommandText,
@@ -176,7 +207,7 @@ export const annyang = {
     recognition = new SpeechRecognition();
 
     const speechRecognitionList = new SpeechGrammarList();
-    for (const grammar of grammarsList) {
+    for (const grammar of allGrammars) {
       speechRecognitionList.addFromString(grammar, 1);
     }
     recognition.grammars = speechRecognitionList;
@@ -274,10 +305,6 @@ export const annyang = {
     }
   },
 
-  addGrammars(grammars) {
-    grammarsList.push(...grammars);
-  },
-
   /**
    * Start listening.
    * It's a good idea to call this after adding some commands first, but not mandatory.
@@ -361,16 +388,6 @@ export const annyang = {
    */
   resume: function() {
     annyang.start();
-  },
-
-  /**
-   * Turn on output of debug messages to the console. Ugly, but super-handy!
-   *
-   * @param {boolean} [newState=true] - Turn on/off debug messages
-   * @method debug
-   */
-  debug: function(newState = true) {
-    debugState = !!newState;
   },
 
   /**
@@ -639,6 +656,17 @@ export const annyang = {
     parseResults(sentences, true /* isFinal */);
   }
 };
+
+speechRecognitionEnabled.subscribe(result => {
+  if (DEBUG) {
+    console.log("Listening: ", result);
+  }
+  if (result) {
+    annyang.start();
+  } else {
+    annyang.abort();
+  }
+});
 
 /**
  * # Good to Know

@@ -1,4 +1,5 @@
 import { storage } from "./common";
+import { hotwordEnabled } from "./store";
 
 export function initContextMenus() {
   chrome.contextMenus.removeAll();
@@ -12,14 +13,7 @@ export function initContextMenus() {
     }
   });
 
-  storage.get(["hotword"], result => {
-    chrome.contextMenus.update("hotword", { checked: result.hotword });
-  });
-
-  chrome.storage.onChanged.addListener(changes => {
-    const hotword = changes.hotword;
-    if (hotword) {
-      chrome.contextMenus.update("hotword", { checked: hotword.newValue });
-    }
+  hotwordEnabled.subscribe(result => {
+    chrome.contextMenus.update("hotword", { checked: result });
   });
 }

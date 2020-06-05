@@ -1,12 +1,12 @@
 import { get } from 'svelte/store';
-import { activeListening } from './store';
+import { isActiveListening } from './store';
 
 function getHost(url) {
   return new URL(url).host;
 }
 
 export function performAction(action) {
-  if (get(activeListening)) {
+  if (isActiveListening()) {
     action();
   }
 }
