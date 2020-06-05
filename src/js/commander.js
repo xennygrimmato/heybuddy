@@ -1,4 +1,4 @@
-import annyang from "./annyang";
+import { annyang } from "./annyang";
 import { DEBUG, storage } from "./common";
 import { hasMessage, sendMessage, resendMessageIfAvailable } from "./notification";
 import { activeListening } from './store';

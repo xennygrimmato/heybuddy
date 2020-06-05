@@ -243,7 +243,7 @@ const commands = [
   },
 
   {
-    commands: ["go to *query", "open *query"],
+    commands: ["go to *query", "open *query", "take me to *query"],
     callback: async query => {
       openTabWithUrl(await generateGoogleLuckyUrl(query));
     }
