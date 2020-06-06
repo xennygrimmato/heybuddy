@@ -144,7 +144,7 @@ const commands = [
 
   {
     commands: ["mute", "mute tab"],
-    callback: query => {
+    callback: () => {
       chrome.tabs.query(
         {
           active: true
@@ -160,7 +160,7 @@ const commands = [
 
   {
     commands: ["unmute", "unmute tab"],
-    callback: query => {
+    callback: () => {
       chrome.tabs.query(
         {
           active: true
@@ -176,7 +176,7 @@ const commands = [
 
   {
     commands: ["mute all (the) tab", "mute all (the) tabs"],
-    callback: query => {
+    callback: () => {
       chrome.tabs.query({}, tabs => {
         for (let tab of tabs) {
           chrome.tabs.update(tab.id, { muted: true });
@@ -187,7 +187,7 @@ const commands = [
 
   {
     commands: ["unmute all (the) tab", "unmute all (the) tabs"],
-    callback: query => {
+    callback: () => {
       chrome.tabs.query({}, tabs => {
         for (let tab of tabs) {
           chrome.tabs.update(tab.id, { muted: false });
@@ -198,7 +198,7 @@ const commands = [
 
   {
     commands: ["mute other (the) tab", "mute other (the) tabs"],
-    callback: query => {
+    callback: () => {
       chrome.tabs.query({}, tabs => {
         for (let tab of tabs) {
           if (!tab.active) {
@@ -211,7 +211,7 @@ const commands = [
 
   {
     commands: ["unmute other (the) tab", "unmute other (the) tabs"],
-    callback: query => {
+    callback: () => {
       chrome.tabs.query({}, tabs => {
         for (let tab of tabs) {
           if (!tab.active) {
@@ -224,7 +224,7 @@ const commands = [
 
   {
     commands: ["maximize", "maximize window"],
-    callback: query => {
+    callback: () => {
       chrome.windows.getCurrent({}, window => {
         chrome.windows.update(window.id, { state: "maximized" });
       });
@@ -233,7 +233,7 @@ const commands = [
 
   {
     commands: ["minimize", "minimize window"],
-    callback: query => {
+    callback: () => {
       chrome.windows.getCurrent({}, window => {
         chrome.windows.update(window.id, { state: "minimized" });
       });
@@ -293,7 +293,7 @@ const commands = [
       "enter full screen",
       "enter full-screen"
     ],
-    callback: query => {
+    callback: () => {
       chrome.windows.getCurrent({}, window => {
         chrome.windows.update(window.id, { state: "fullscreen" });
       });
@@ -302,9 +302,40 @@ const commands = [
 
   {
     commands: ["exit fullscreen", "exit full screen", "exit full-screen"],
-    callback: query => {
+    callback: () => {
       chrome.windows.getCurrent({}, window => {
         chrome.windows.update(window.id, { state: "normal" });
+      });
+    }
+  },
+
+  {
+    commands: ["next tab", "switch (to) right tab", "switch tab", "right tab"],
+    callback: () => {
+      chrome.tabs.query({}, tabs => {
+        let activeTabIndex = -1;
+        for (const tab of tabs) {
+          if (tab.active) {
+            activeTabIndex = tab.index;
+          }
+        }
+        const nextTabIndex = activeTabIndex + 1 < tabs.length ? activeTabIndex + 1 : 0;
+        chrome.tabs.update(tabs[nextTabIndex].id, { active: true });
+      });
+    }
+  },
+  {
+    commands: ["previous tab", "last tab", "switch (to) left tab", "left tab"],
+    callback: () => {
+      chrome.tabs.query({}, tabs => {
+        let activeTabIndex = -1;
+        for (const tab of tabs) {
+          if (tab.active) {
+            activeTabIndex = tab.index;
+          }
+        }
+        const nextTabIndex = activeTabIndex - 1 > 0 ? activeTabIndex - 1 : tabs.length - 1;
+        chrome.tabs.update(tabs[nextTabIndex].id, { active: true });
       });
     }
   }
