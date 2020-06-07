@@ -24,67 +24,34 @@ function selectResult(index) {
 
 const commands = [
   {
-    commands: ["go back"],
+    action: 'NAVIGATION_BACK',
     callback: () => {
       executeScripts("window.history.back();");
     }
   },
 
   {
-    commands: ["go forward"],
+    action: 'NAVIGATION_FORWARD',
     callback: () => {
       executeScripts("window.history.forward();");
     }
   },
 
   {
-    commands: [
-      "reload",
-      "reload tab",
-      "reload this tab",
-      "reload the tab",
-      "refresh",
-      "refresh tab",
-      "refresh this tab",
-      "refresh the tab"
-    ],
+    action: 'NAVIGATION_RELOAD',
     callback: () => {
       chrome.tabs.reload({});
     }
   },
 ];
 
-const wordToIndices = [
-  { words: ['best', 'first', 'top', '1st'], index: 0 },
-  { words: ['second', '2nd'], index: 1 },
-  { words: ['third', '3rd'], index: 2 },
-  { words: ['fourth', '4th'], index: 3 },
-  { words: ['fifth', '5th'], index: 4 },
-  { words: ['sixth', '6th'], index: 5 },
-  { words: ['seventh', '7th'], index: 6 },
-  { words: ['eighth', '8th'], index: 7 },
-  { words: ['ninth', '9th'], index: 8 },
-  { words: ['tenth', '10th'], index: 9 },
-];
-
-for (const wordToIndex of wordToIndices) {
-  const words = [];
-  for (const word of wordToIndex.words) {
-    words.push(...[
-      word,
-      `${word} result`,
-      `${word} results`,
-      `${word} link`,
-      `${word} answer`,
-      `${word} response`
-    ]);
-  }
+for (let i = 0; i < 10; i++) {
   commands.push({
-      commands: words,
-      callback: () => {
-        executeScripts(selectResultScript + `selectResult(${wordToIndex.index});`)
-      }
-    });
+    action: `NAVIGATION_SELECT_${i + 1}`,
+    callback: () => {
+      executeScripts(selectResultScript + `selectResult(${i});`);
+    }
+  });
 }
 
 export default commands;

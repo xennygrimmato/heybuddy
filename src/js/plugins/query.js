@@ -3,21 +3,9 @@ import axios from "axios";
 import { activeListening } from '../store';
 import { openTabWithUrl, performActionWithDelay } from '../core';
 
-/** ------- Search query ------- */
-const prependQueryPhrase = queries => {
-  let updatedQueries = Array.from(queries);
-  for (let query of queries) {
-    updatedQueries.push("show me " + query);
-    updatedQueries.push("show me a " + query);
-    updatedQueries.push("show me the " + query);
-  }
-  return updatedQueries;
-};
-
 async function loadAndParsePage(url) {
   const response = await axios.get(url);
-  const parsedResponse = cheerio.load(response.data);
-  return parsedResponse;
+  return cheerio.load(response.data);
 }
 
 async function generateGoogleLuckyUrl(query) {
@@ -51,12 +39,7 @@ const siteToUrl = {
 const searchCommands = [];
 for (const key in siteToUrl) {
   searchCommands.push({
-    commands: [
-      "search for *query on " + key,
-      "search for *query at " + key,
-      "*query on " + key,
-      "*query at " + key
-    ],
+    action: `QUERY_SEARCH_QUERY_ON_${key.toUpperCase()}`,
     callback: query => {
       openTabWithUrl(siteToUrl[key] + query);
     },
@@ -66,14 +49,7 @@ for (const key in siteToUrl) {
 
 const commands = [
   {
-    commands: prependQueryPhrase([
-      "image of *query",
-      "photo of *query",
-      "picture of *query",
-      "images of *query",
-      "photos of *query",
-      "pictures of *query"
-    ]),
+    action: 'QUERY_SEARCH_IMAGE',
     callback: query => {
       openTabWithUrl(
         "https://www.google.com/search?tbm=isch&q=" + query
@@ -81,7 +57,7 @@ const commands = [
     }
   },
   {
-    commands: prependQueryPhrase(["news of *query", "news about *query"]),
+    action: 'QUERY_SEARCH_NEWS',
     callback: query => {
       openTabWithUrl(
         "https://www.google.com/search?tbm=nws&q=" + query
@@ -89,33 +65,20 @@ const commands = [
     }
   },
   {
-    commands: prependQueryPhrase([
-      "news",
-      "news today",
-      "today news",
-      "today's news"
-    ]),
+    action: 'QUERY_NEWS',
     callback: () => {
       openTabWithUrl("https://news.google.com/");
     }
   },
   {
-    commands: prependQueryPhrase([
-      "map of *query",
-      "map to *query",
-      "how to get to *query",
-      "how do I get to *query"
-    ]),
+    action: 'QUERY_SEARCH_MAP',
     callback: query => {
       openTabWithUrl("https://www.google.com/maps?q=" + query);
     }
   },
 
   {
-    commands: prependQueryPhrase([
-      "direction from *from to *to",
-      "directions from *from to *to"
-    ]),
+    action: 'QUERY_SEARCH_DIRECTION_FROM_TO',
     callback: (from, to) => {
       performActionWithDelay(() => {
         openTabWithUrl(
@@ -126,38 +89,26 @@ const commands = [
   },
 
   {
-    commands: prependQueryPhrase([
-      "direction from *query",
-      "directions from *query"
-    ]),
+    action: 'QUERY_SEARCH_DIRECTION_FROM',
     callback: query => {
       openTabWithUrl("https://www.google.com/maps/dir/" + query);
     }
   },
 
   {
-    commands: prependQueryPhrase([
-      "direction to *query",
-      "directions to *query"
-    ]),
+    action: 'QUERY_SEARCH_DIRECTION_TO',
     callback: query => {
       openTabWithUrl("https://www.google.com/maps/dir//" + query);
     }
   },
   {
-    commands: ["wikipedia"],
+    action: 'QUERY_GO_TO_WIKIPEDIA',
     callback: () => {
       openTabWithUrl("https://wikipedia.org/");
     }
   },
   {
-    commands: [
-      "about *query",
-      "wiki about *query",
-      "wiki *query",
-      "wikipedia about *query",
-      "wikipedia *query"
-    ],
+    action: 'QUERY_SEARCH_WIKIPEDIA',
     callback: query => {
       openTabWithUrl(
         "https://en.wikipedia.org/wiki/Special:Search/" + query
@@ -165,21 +116,13 @@ const commands = [
     }
   },
   {
-    commands: ["play video", "video", "play videos", "videos"],
+    action: 'QUERY_GO_TO_VIDEO',
     callback: () => {
       openTabWithUrl("https://www.youtube.com/");
     }
   },
   {
-    commands: prependQueryPhrase([
-      "video of *query",
-      "video about *query",
-      "video *query",
-      "videos of *query",
-      "videos about *query",
-      "videos *query",
-      "watch *query"
-    ]),
+    action: 'QUERY_SEARCH_VIDEO',
     callback: query => {
       openTabWithUrl(
         "https://www.youtube.com/results?search_query=" + query
@@ -187,24 +130,19 @@ const commands = [
     }
   },
   {
-    commands: ["play music", "music"],
+    action: 'QUERY_GO_TO_MUSIC',
     callback: () => {
       openTabWithUrl("https://play.google.com/music/listen");
     }
   },
   {
-    commands: ["shopping", "buy something"],
+    action: 'QUERY_GO_TO_SHOPPING',
     callback: () => {
       openTabWithUrl("https://www.amazon.com/?tag=bewisse-20");
     }
   },
   {
-    commands: [
-      "shop for a *query",
-      "shop for *query",
-      "buy a *query",
-      "buy *query"
-    ],
+    action: 'QUERY_SEARCH_SHOPPING',
     callback: query => {
       openTabWithUrl(
         "https://www.amazon.com/s?tag=bewisse-20&k=" + query
@@ -212,50 +150,35 @@ const commands = [
     }
   },
   {
-    commands: [
-      "go to download",
-      "open download",
-      "go to downloads",
-      "open downloads"
-    ],
-    callback: query => {
+    action: 'QUERY_GO_TO_DOWNLOADS',
+    callback: () => {
       openTabWithUrl("chrome://downloads");
     }
   },
 
   {
-    commands: [
-      "go to bookmark",
-      "open bookmark",
-      "go to bookmarks",
-      "open bookmarks"
-    ],
-    callback: query => {
+    action: 'QUERY_GO_TO_BOOKMARKS',
+    callback: () => {
       openTabWithUrl("chrome://bookmarks");
     }
   },
 
   {
-    commands: ["go to history", "open history"],
-    callback: query => {
+    action: 'QUERY_GO_TO_HISTORY',
+    callback: () => {
       openTabWithUrl("chrome://history");
     }
   },
 
   {
-    commands: ["go to *query", "open *query", "take me to *query"],
+    action: 'QUERY_GO_TO_QUERY',
     callback: async query => {
       openTabWithUrl(await generateGoogleLuckyUrl(query));
     }
   },
   ...searchCommands,
   {
-    commands: [
-      "search for *query on *site",
-      "search for *query at *site",
-      "*query on *site",
-      "*query at *site"
-    ],
+    action: 'QUERY_SEARCH_QUERY_ON_SITE',
     callback: async (query, site) => {
       openTabWithUrl(
         await generateGoogleLuckyUrl(query + " on " + site)
@@ -264,7 +187,7 @@ const commands = [
     priority: 0.3
   },
   {
-    commands: ["search for *query", "google *query", "*query"],
+    action: 'QUERY_SEARCH_QUERY',
     callback: query => {
       chrome.storage.local.get(["tts"], result => {
         // If TTS is enabled, we need to clear notifications to avoid the TTS to feedback into the command.

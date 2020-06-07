@@ -20,7 +20,7 @@ function forAllAudios(perAudioCommand) {
 
 const commands = [
   {
-    commands: ["pause", "stop"],
+    action: 'MEDIA_PAUSE',
     callback: () => {
       executeScripts(
         forAllVideos("video.pause();") + forAllAudios("audio.pause();")
@@ -29,7 +29,7 @@ const commands = [
   },
 
   {
-    commands: ["play", "resume"],
+    action: 'MEDIA_PLAY',
     callback: () => {
       executeScripts(
         forAllVideos("video.play();") + forAllAudios("audio.play();")
@@ -38,7 +38,7 @@ const commands = [
   },
 
   {
-    commands: ["increase volume", "volume up"],
+    action: 'MEDIA_VOLUME_UP',
     callback: () => {
       executeScripts(
         forAllVideos("video.volume = Math.min(1, video.volume + .2);") +
@@ -48,7 +48,7 @@ const commands = [
   },
 
   {
-    commands: ["decrease volume", "volume down"],
+    action: 'MEDIA_VOLUME_DOWN',
     callback: () => {
       executeScripts(
         forAllVideos("video.volume = Math.max(0, video.volume - .2);") +
@@ -58,7 +58,7 @@ const commands = [
   },
 
   {
-    commands: ["(make it) loud"],
+    action: 'MEDIA_VOLUME_LOUD',
     callback: () => {
       executeScripts(
         forAllVideos("video.volume = .8;") +
@@ -68,7 +68,7 @@ const commands = [
   },
 
   {
-    commands: ["(make it) very loud"],
+    action: 'MEDIA_VOLUME_VERY_LOUD',
     callback: () => {
       executeScripts(
         forAllVideos("video.volume = 1;") +
@@ -78,7 +78,7 @@ const commands = [
   },
 
   {
-    commands: ["(make it) quiet"],
+    action: 'MEDIA_VOLUME_QUIET',
     callback: () => {
       executeScripts(
         forAllVideos("video.volume = .2;") +
@@ -88,7 +88,7 @@ const commands = [
   },
 
   {
-    commands: ["skip *query seconds", "(go) forward *query seconds"],
+    action: 'MEDIA_FORWARD_SECONDS',
     callback: query => {
       let seconds = parseFloat(query);
       if (!(seconds > 0)) {
@@ -102,7 +102,7 @@ const commands = [
   },
 
   {
-    commands: ["(go) back *query seconds"],
+    action: 'MEDIA_BACKWARD_SECONDS',
     callback: query => {
       let seconds = parseFloat(query);
       if (!(seconds > 0)) {
@@ -116,7 +116,7 @@ const commands = [
   },
 
   {
-    commands: ["skip *query minutes", "(go) forward *query minutes"],
+    action: 'MEDIA_FORWARD_MINUTES',
     callback: query => {
       let minutes = parseFloat(query);
       if (!(minutes > 0)) {
@@ -131,7 +131,7 @@ const commands = [
   },
 
   {
-    commands: ["(go) back *query minutes"],
+    action: 'MEDIA_BACKWARD_MINUTES',
     callback: query => {
       let minutes = parseFloat(query);
       if (!(minutes > 0)) {
@@ -146,14 +146,7 @@ const commands = [
   },
 
   {
-    commands: [
-      "skip 1 minute",
-      "(go) forward 1 minute",
-      "skip one minute",
-      "(go) forward one minute",
-      "skip a minute",
-      "(go) forward a minute"
-    ],
+    action: 'MEDIA_FORWARD_1_MINUTE',
     callback: () => {
       let seconds = 60;
       executeScripts(
@@ -164,11 +157,7 @@ const commands = [
   },
 
   {
-    commands: [
-      "(go) back 1 minute",
-      "(go) back one minute",
-      "(go) back a minute"
-    ],
+    action: 'MEDIA_BACKWARD_1_MINUTE',
     callback: () => {
       let seconds = 60;
       executeScripts(
@@ -179,7 +168,7 @@ const commands = [
   },
 
   {
-    commands: ["(go) back to (the) beginning"],
+    action: 'MEDIA_TO_BEGINNING',
     callback: () => {
       executeScripts(
         forAllVideos("video.currentTime = 0;") +
@@ -189,7 +178,7 @@ const commands = [
   },
 
   {
-    commands: ["(go) to (the) end"],
+    action: 'MEDIA_TO_END',
     callback: () => {
       executeScripts(
         forAllVideos("video.currentTime = video.duration;") +

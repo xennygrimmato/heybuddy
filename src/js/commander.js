@@ -3,6 +3,7 @@ import { DEBUG } from "./common";
 import { sendMessage, resendMessageIfAvailable } from "./notification";
 import { activeListening, isActiveListening } from './store';
 import { getActiveTab, performActionWithDelay } from './core';
+import enData from './langs/en.json';
 
 const DEFAULT_COMMAND_PRIORITY = 0.5;
 const addedCommands = new Set();
@@ -87,7 +88,7 @@ function addCommands(
   for (const cmd of commandList) {
     const command = cmd.toLowerCase();
     if (DEBUG) {
-      if (command.trim() != command) {
+      if (command.trim() !== command) {
         console.error(`${command} is not trimmed`);
       }
       if (addedCommands.has(command)) {
@@ -101,15 +102,19 @@ function addCommands(
 
 /** ------- Handle regular commands ------- */
 function initRegularCommands(allPlugins) {
+  const actionToCommand = {};
   for (const command of allPlugins) {
     if (DEBUG) {
       const keys = Object.keys(command);
-      if (!keys.includes("commands") || !keys.includes("callback")) {
+      if (!keys.includes("action") || keys.includes('commands') || !keys.includes("callback")) {
         console.error(`Invalid command in plugin: `, command);
       }
     }
-    addCommands(command.commands, command.callback, {
-      priority: command.priority || DEFAULT_COMMAND_PRIORITY
+    actionToCommand[command.action] = command;
+  }
+  for (const [action, commands] of Object.entries(enData)) {
+    addCommands(commands, actionToCommand[action].callback, {
+      priority: actionToCommand[action].priority || DEFAULT_COMMAND_PRIORITY
     });
   }
 }

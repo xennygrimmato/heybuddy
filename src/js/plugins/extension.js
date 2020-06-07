@@ -3,25 +3,23 @@ import { activeListening } from '../store';
 
 const commands = [
   {
-    commands: ["bye", "bye bye", "goodbye", "good bye", "close"],
+    action: 'EXTENSION_CLOSE',
     callback: () => {
       activeListening.set(false);
     }
   },
   {
-    commands: ["see supported commands", "what can you do"],
+    action: 'EXTENSION_HELP',
     callback: () => {
       openTabWithUrl("https://bewisse.com/heybuddy/commands/");
     }
   },
   {
-    commands: ["*query no", "*query cancel", "*query stop"],
-    callback: () => {
-      
-    }
+    action: 'EXTENSION_CANCEL',
+    callback: () => {}
   },
   {
-    commands: ["submit", "enter"],
+    action: 'EXTENSION_SUBMIT',
     callback: () => {
       executeScripts(`
         const focusedElement = document.activeElement;
@@ -39,7 +37,7 @@ const commands = [
     }
   },
   {
-    commands: ["write *query"],
+    action: 'EXTENSION_WRITE',
     callback: query => {
       query = query.replace("'", "\\'");
       executeScripts(`

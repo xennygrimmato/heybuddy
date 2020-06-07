@@ -22,13 +22,7 @@ const ZOOM_LEVEL = [
 
 const commands = [
   {
-    commands: [
-      "zoom in",
-      "zoom",
-      "enlarge",
-      "make (it) larger",
-      "make (it) bigger"
-    ],
+    action: 'PAGE_ZOOM_IN',
     callback: async () => {
       const activeTab = await getActiveTab();
       chrome.tabs.getZoom(activeTab.id, zoomFactor => {
@@ -43,7 +37,7 @@ const commands = [
   },
 
   {
-    commands: ["zoom out", "make (it) smaller"],
+    action: 'PAGE_ZOOM_OUT',
     callback: async () => {
       const activeTab = await getActiveTab();
       chrome.tabs.getZoom(activeTab.id, zoomFactor => {
@@ -58,7 +52,7 @@ const commands = [
     }
   },
   {
-    commands: ["reset zoom", "make (it) normal size"],
+    action: 'PAGE_ZOOM_RESET',
     callback: async () => {
       const activeTab = await getActiveTab();
       chrome.tabs.setZoom(activeTab.id, 1);
@@ -66,49 +60,49 @@ const commands = [
   },
 
   {
-    commands: ["find *query", "look for *query"],
+    action: 'PAGE_FIND',
     callback: query => {
       executeScripts(`window.find('${query}');`);
     }
   },
 
   {
-    commands: ["scroll down", "(go) down"],
+    action: 'PAGE_SCROLL_DOWN',
     callback: () => {
       executeScripts("window.scrollBy(0, 250);");
     }
   },
 
   {
-    commands: ["page down"],
+    action: 'PAGE_PAGE_DOWN',
     callback: () => {
       executeScripts("window.scrollBy(0, 1000);");
     }
   },
 
   {
-    commands: ["scroll up", "(go) up"],
+    action: 'PAGE_SCROLL_UP',
     callback: () => {
       executeScripts("window.scrollBy(0, -250);");
     }
   },
 
   {
-    commands: ["page up"],
+    action: 'PAGE_PAGE_UP',
     callback: () => {
       executeScripts("window.scrollBy(0, -1000);");
     }
   },
 
   {
-    commands: ["go to (the) top", "scroll to (the) top"],
+    action: 'PAGE_TO_TOP',
     callback: () => {
       executeScripts("window.scrollTo(0, 0);");
     }
   },
 
   {
-    commands: ["go to (the) bottom", "scroll to (the) bottom"],
+    action: 'PAGE_TO_BOTTOM',
     callback: () => {
       executeScripts(
         "window.scrollTo(0, document.body.scrollHeight);"

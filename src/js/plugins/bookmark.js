@@ -3,11 +3,7 @@ import { getActiveTab } from '../core';
 
 const commands = [
   {
-    commands: [
-      "bookmark",
-      "bookmark (this) page",
-      "add (this) (page) (to) bookmark"
-    ],
+    action: 'BOOKMARK_ADD',
     callback: () => {
       const bookmarkHandler = async () => {
         const activeTab = await getActiveTab();
@@ -29,11 +25,7 @@ const commands = [
     }
   },
   {
-    commands: [
-      "remove (from) bookmark",
-      "remove this bookmark",
-      "remove the bookmark"
-    ],
+    action: "BOOKMARK_REMOVE",
     callback: () => {
       const unbookmarkHandler = async () => {
         const activeTab = await getActiveTab();

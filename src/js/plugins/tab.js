@@ -3,7 +3,7 @@ import { performActionWithDelay } from '../core';
 const commands = [
   {
     /** ------- Tab management commands ------- */
-    commands: ["open new tab"],
+    action: 'TABS_NEW_TAB',
     callback: () => {
       performActionWithDelay(() => {
         chrome.tabs.create({});
@@ -11,11 +11,7 @@ const commands = [
     }
   },
   {
-    commands: [
-      "close tab",
-      "close this tab",
-      "close the tab",
-    ],
+    action: 'TABS_CLOSE_TAB',
     callback: () => {
       performActionWithDelay(() => {
         chrome.tabs.query(
@@ -33,13 +29,7 @@ const commands = [
     priority: 1
   },
   {
-    commands: [
-      "close other tab",
-      "close other tabs",
-      "close the other tab",
-      "close the other tabs",
-      "close all (tabs) but this (tab)"
-    ],
+    action: 'TABS_CLOSE_OTHER_TABS',
     callback: () => {
       chrome.tabs.query(
         {
@@ -55,7 +45,7 @@ const commands = [
   },
 
   {
-    commands: ["close tab to the right", "close tabs to the right"],
+    action: 'TABS_CLOSE_RIGHT_TABS',
     callback: () => {
       chrome.tabs.query({}, tabs => {
         let activeTabIndex = -1;
@@ -74,7 +64,7 @@ const commands = [
   },
 
   {
-    commands: ["close tab to the left", "close tabs to the left"],
+    action: 'TABS_CLOSE_LEFT_TABS',
     callback: () => {
       chrome.tabs.query({}, tabs => {
         let activeTabIndex = -1;
@@ -92,15 +82,7 @@ const commands = [
     }
   },
   {
-    commands: [
-      "close all tab",
-      "close all tabs",
-      "close all the tab",
-      "close all the tabs",
-      "close window",
-      "close this window",
-      "exit window"
-    ],
+    action: 'TABS_CLOSE_ALL_TABS',
     callback: () => {
       performActionWithDelay(() => {
         chrome.windows.getCurrent({}, window => {
@@ -111,7 +93,7 @@ const commands = [
   },
 
   {
-    commands: ["pin", "pin tab", "pin this tab", "pin the tab"],
+    action: 'TABS_PIN_TAB',
     callback: () => {
       chrome.tabs.query(
         {
@@ -127,7 +109,7 @@ const commands = [
   },
 
   {
-    commands: ["unpin", "unpin tab", "unpin this tab", "unpin the tab"],
+    action: 'TABS_UNPIN_TAB',
     callback: () => {
       chrome.tabs.query(
         {
@@ -143,7 +125,7 @@ const commands = [
   },
 
   {
-    commands: ["mute", "mute tab"],
+    action: 'TABS_MUTE_TAB',
     callback: () => {
       chrome.tabs.query(
         {
@@ -159,7 +141,7 @@ const commands = [
   },
 
   {
-    commands: ["unmute", "unmute tab"],
+    action: 'TABS_UNMUTE_TAB',
     callback: () => {
       chrome.tabs.query(
         {
@@ -175,7 +157,7 @@ const commands = [
   },
 
   {
-    commands: ["mute all (the) tab", "mute all (the) tabs"],
+    action: 'TABS_MUTE_ALL_TABS',
     callback: () => {
       chrome.tabs.query({}, tabs => {
         for (let tab of tabs) {
@@ -186,7 +168,7 @@ const commands = [
   },
 
   {
-    commands: ["unmute all (the) tab", "unmute all (the) tabs"],
+    action: 'TABS_UNMUTE_ALL_TABS',
     callback: () => {
       chrome.tabs.query({}, tabs => {
         for (let tab of tabs) {
@@ -197,7 +179,7 @@ const commands = [
   },
 
   {
-    commands: ["mute other (the) tab", "mute other (the) tabs"],
+    action: 'TABS_MUTE_OTHER_TABS',
     callback: () => {
       chrome.tabs.query({}, tabs => {
         for (let tab of tabs) {
@@ -210,7 +192,8 @@ const commands = [
   },
 
   {
-    commands: ["unmute other (the) tab", "unmute other (the) tabs"],
+
+    action: 'TABS_UNMUTE_OTHER_TABS',
     callback: () => {
       chrome.tabs.query({}, tabs => {
         for (let tab of tabs) {
@@ -223,7 +206,8 @@ const commands = [
   },
 
   {
-    commands: ["maximize", "maximize window"],
+
+    action: 'TABS_MAXIMIZE_WINDOW',
     callback: () => {
       chrome.windows.getCurrent({}, window => {
         chrome.windows.update(window.id, { state: "maximized" });
@@ -232,7 +216,7 @@ const commands = [
   },
 
   {
-    commands: ["minimize", "minimize window"],
+    action: 'TABS_MINIMIZE_WINDOW',
     callback: () => {
       chrome.windows.getCurrent({}, window => {
         chrome.windows.update(window.id, { state: "minimized" });
@@ -240,7 +224,8 @@ const commands = [
     }
   },
   {
-    commands: ["side by side"],
+
+    action: 'TABS_SIDE_BY_SIDE',
     callback: () => {
       chrome.tabs.query({}, (tabs => {
         if (tabs.length >= 2) {
@@ -285,14 +270,8 @@ const commands = [
     }
   },
   {
-    commands: [
-      "fullscreen",
-      "full screen",
-      "full-screen",
-      "enter fullscreen",
-      "enter full screen",
-      "enter full-screen"
-    ],
+
+    action: 'TABS_ENTER_FULLSCREEN',
     callback: () => {
       chrome.windows.getCurrent({}, window => {
         chrome.windows.update(window.id, { state: "fullscreen" });
@@ -301,7 +280,8 @@ const commands = [
   },
 
   {
-    commands: ["exit fullscreen", "exit full screen", "exit full-screen"],
+
+    action: 'TABS_EXIT_FULLSCREEN',
     callback: () => {
       chrome.windows.getCurrent({}, window => {
         chrome.windows.update(window.id, { state: "normal" });
@@ -310,7 +290,8 @@ const commands = [
   },
 
   {
-    commands: ["next tab", "switch (to) right tab", "switch tab", "right tab"],
+
+    action: 'TABS_NEXT_TAB',
     callback: () => {
       chrome.tabs.query({}, tabs => {
         let activeTabIndex = -1;
@@ -325,7 +306,8 @@ const commands = [
     }
   },
   {
-    commands: ["previous tab", "last tab", "switch (to) left tab", "left tab"],
+
+    action: 'TABS_PREVIOUS_TAB',
     callback: () => {
       chrome.tabs.query({}, tabs => {
         let activeTabIndex = -1;
