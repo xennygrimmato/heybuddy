@@ -51,3 +51,54 @@ export async function openTabWithUrl(url) {
     chrome.tabs.create({ url: url });
   }
 }
+
+function get_search_confidence(tab, text) {
+  // 1. Get all content in <body>...</body> tags
+  // 2. Get frequency of text
+  return 1.0;
+}
+
+async function find_tab_with_text(text) {
+  chrome.tabs.query({windowId: -2}, tabs => {
+    for (const tab of tabs) {
+      console.log(tab.title, tab.url)
+    }
+    // tab_confidence_map = {};
+    // for (tab in tabs) {
+    //   console.log(tab.title, tab.url)
+    //   tab_confidence_map[tab.id] = get_search_confidence(tab, text);
+    // }
+    // max_confidence = 0.0
+    // max_confidence_tab = -1
+    // for (const [key, value] of Object.entries(tab_confidence_map)) {
+    //   if (value > max_confidence) {
+    //     max_confidence = value
+    //     max_confidence_tab = key
+    //   }
+    // }
+    // return max_confidence_tab
+  })
+}
+
+export function openTabWithText(windowId, text) {
+  // Get id of tab containing text
+  // find_tab_with_text(text, (tabId => {
+  //   console.log('here2')
+  //   chrome.tabs.update(tabId, { active: true });
+  // }));
+  chrome.tabs.query({windowId: windowId}, tabs => {
+    let goodIdx = -1;
+    for (const tab of tabs) {
+      if (tab.title === undefined) {
+        console.log(tab.index)
+        continue
+      }
+      if (tab.title.toLowerCase().includes(text)) {
+        goodIdx = tab.index
+      }
+      console.log(tab.title, tab.url)
+    }
+    console.log("goodIdx" + goodIdx)
+    chrome.tabs.update(tabs[goodIdx].id, { active: true });
+  });
+}

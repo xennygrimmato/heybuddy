@@ -1,4 +1,4 @@
-import { performActionWithDelay } from '../core';
+import { performActionWithDelay, openTabWithText } from '../core';
 
 
 
@@ -300,6 +300,9 @@ const commands = [
       chrome.tabs.query({windowId: -2}, tabs => {
         let goodIdx = -1;
         for (const tab of tabs) {
+          if (tab.title === undefined) {
+            console.log(tab.index)
+          }
           if (tab.title.includes("Codeforces")) {
             goodIdx = tab.index
           }
@@ -314,10 +317,10 @@ const commands = [
     action: 'TABS_FIND_TAB',
     callback: query => {
       console.log(query);
-      chrome.tabs.update(tabs[0].id, { active: true });
-      // chrome.windows.getCurrent({}, window => {
-      //   openTabWithText(window.id, "query");
-      // });
+      // chrome.tabs.update(tabs[0].id, { active: true });
+      chrome.windows.getCurrent({}, window => {
+        openTabWithText(window.id, query);
+      });
     }
   },
 
