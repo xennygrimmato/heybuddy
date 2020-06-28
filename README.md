@@ -38,8 +38,8 @@ You may fork and redistribute Hey Buddy for a small group of friends / colleague
 
 ## Installation
 
-Run: `npm run install` , then `npm run start` . This will create a build/ directory with the extension artifacts.
+Run: `npm install` , then `npm run build-chrome` . This will create a build/ directory with the extension artifacts.
 Simply load the build/ directory into chrome://extensions.
 
-For production build, run `npm run build` .
+<!-- For production build, run `npm run build` . -->
 
