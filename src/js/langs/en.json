@@ -219,7 +219,7 @@
   ],
   "PAGE_ZOOM_OUT": ["zoom out", "make (it) smaller"],
   "PAGE_ZOOM_RESET": ["reset zoom", "make (it) normal size"],
-  "PAGE_FIND": ["find *query", "look for *query"],
+  "PAGE_FIND": ["dont do anything *query"],
   "PAGE_SCROLL_DOWN": ["scroll down", "(go) down"],
   "PAGE_PAGE_DOWN": ["page down"],
   "PAGE_SCROLL_UP": ["scroll up", "(go) up"],
@@ -518,5 +518,14 @@
     "last tab",
     "switch (to) left tab",
     "left tab"
+  ],
+  "TABS_FIND_CF": [
+    "find codeforces tab",
+    "switch to codeforces",
+    "codeforces",
+    "cf"
+  ],
+  "TABS_FIND_TAB": [
+    "find *query"
   ]
 }

@@ -1,5 +1,7 @@
 import { performActionWithDelay } from '../core';
 
+
+
 const commands = [
   {
     /** ------- Tab management commands ------- */
@@ -286,6 +288,36 @@ const commands = [
       chrome.windows.getCurrent({}, window => {
         chrome.windows.update(window.id, { state: "normal" });
       });
+    }
+  },
+
+  {
+    action: 'TABS_FIND_CF',
+    callback: () => {
+      // chrome.windows.getCurrent({}, window => {
+      //   openTabWithText(window.id, "Codeforces");
+      // });
+      chrome.tabs.query({windowId: -2}, tabs => {
+        let goodIdx = -1;
+        for (const tab of tabs) {
+          if (tab.title.includes("Codeforces")) {
+            goodIdx = tab.index
+          }
+          console.log(tab.title, tab.url)
+        }
+        chrome.tabs.update(tabs[goodIdx].id, { active: true });
+      });
+    }
+  },
+
+  {
+    action: 'TABS_FIND_TAB',
+    callback: query => {
+      console.log(query);
+      chrome.tabs.update(tabs[0].id, { active: true });
+      // chrome.windows.getCurrent({}, window => {
+      //   openTabWithText(window.id, "query");
+      // });
     }
   },
 
