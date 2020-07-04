@@ -136,7 +136,9 @@ export function groupTabsWithTitle(windowId, title) {
         console.log(tab.title, tab.url);
       }
       console.log("matchingIdxs", matchingIdxs);
-      chrome.tabs.highlight({'tabs': matchingIdxs});
+      if (matchingIds.length != 0) {
+        chrome.tabs.highlight({'tabs': matchingIdxs});
+      }
     });
   });
 }
