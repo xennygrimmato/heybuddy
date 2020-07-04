@@ -106,6 +106,7 @@ export function openTabWithText(windowId, text) {
 // groupTabsWithTitle finds all the tabs matching the given title and groups them together.
 // TODO(abansal4032): List the matches and let the user select which one to open.
 export function groupTabsWithTitle(windowId, title) {
+  return new Promise((resolve, reject) => {
   chrome.tabs.query({windowId: windowId}, tabs => {
     let matchingIds = [];
     for (const tab of tabs) {
@@ -137,8 +138,38 @@ export function groupTabsWithTitle(windowId, title) {
       }
       console.log("matchingIdxs", matchingIdxs);
       if (matchingIds.length != 0) {
-        chrome.tabs.highlight({'tabs': matchingIdxs});
+        // chrome.tabs.highlight({'tabs': matchingIdxs});
+        resolve(matchingIdxs);
+      } else {
+        reject("No matching tab found");
       }
     });
   });
+});
+}
+
+export async function createOrGoToGooglePhotos() {
+  try {
+    const matchingIdxs = await groupTabsWithTitle(
+      chrome.windows.WINDOW_ID_CURRENT,
+      query
+    );
+    chrome.tabs.highlight({ tabs: matchingIdxs });
+  } catch (err) {
+    let url = "https://photos.google.com";
+    chrome.tabs.create({ url: url });
+  }
+}
+
+export async function findTab(query) {
+  console.log(query);
+  try {
+    const matchingIdxs = await groupTabsWithTitle(
+      chrome.windows.WINDOW_ID_CURRENT,
+      query
+    );
+    chrome.tabs.highlight({ tabs: matchingIdxs });
+  } catch (err) {
+    console.log(err);
+  }
 }

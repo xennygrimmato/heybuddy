@@ -394,6 +394,11 @@
     "open bookmarks"
   ],
   "QUERY_GO_TO_HISTORY": ["go to history", "open history"],
+  "GO_TO_GOOGLE_PHOTOS": [
+    "show my photos",
+    "show me my photos",
+    "open my (google) photos account"
+  ],
   "QUERY_GO_TO_QUERY": ["go to *query", "open *query", "take me to *query"],
   "QUERY_SEARCH_QUERY_ON_BING": [
     "search for *query on Bing",
@@ -518,12 +523,6 @@
     "last tab",
     "switch (to) left tab",
     "left tab"
-  ],
-  "TABS_FIND_CF": [
-    "find codeforces tab",
-    "switch to codeforces",
-    "codeforces",
-    "cf"
   ],
   "TABS_FIND_TAB": [
     "find *query"
