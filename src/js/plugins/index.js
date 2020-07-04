@@ -6,6 +6,7 @@ import page from './page';
 import query from './query';
 import tab from './tab';
 import docs from './docs';
+import photos from './photos';
 
 const allPlugins = [
   ...tab,
@@ -16,6 +17,7 @@ const allPlugins = [
   ...extension,
   ...query,
   ...docs,
+  ...photos
 ];
 
 export {
