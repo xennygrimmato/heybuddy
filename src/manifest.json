@@ -31,10 +31,10 @@
   "commands": {
     "_execute_browser_action": {
       "suggested_key": {
-        "windows": "Ctrl+Shift+H",
-        "mac": "Command+Shift+H",
-        "chromeos": "Ctrl+Shift+H",
-        "linux": "Ctrl+Shift+H"
+        "windows": "Ctrl+H",
+        "mac": "Command+H",
+        "chromeos": "Ctrl+H",
+        "linux": "Ctrl+H"
       }
     }
   },
