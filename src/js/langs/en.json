@@ -527,5 +527,8 @@
   ],
   "TABS_FIND_TAB": [
     "find *query"
+  ],
+  "CREATE_DOCS": [
+    "create a (new) (google) *query"
   ]
 }

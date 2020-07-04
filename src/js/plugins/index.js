@@ -5,6 +5,7 @@ import navigation from './navigation';
 import page from './page';
 import query from './query';
 import tab from './tab';
+import docs from './docs';
 
 const allPlugins = [
   ...tab,
@@ -14,6 +15,7 @@ const allPlugins = [
   ...page,
   ...extension,
   ...query,
+  ...docs,
 ];
 
 export {
