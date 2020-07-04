@@ -1,4 +1,4 @@
-import { performActionWithDelay, openTabWithText, groupTabsWithTitle } from '../core';
+import { performActionWithDelay, findTab } from '../core';
 
 
 
@@ -292,34 +292,9 @@ const commands = [
   },
 
   {
-    action: 'TABS_FIND_CF',
-    callback: () => {
-      // chrome.windows.getCurrent({}, window => {
-      //   openTabWithText(window.id, "Codeforces");
-      // });
-      chrome.tabs.query({windowId: -2}, tabs => {
-        let goodIdx = -1;
-        for (const tab of tabs) {
-          if (tab.title === undefined) {
-            console.log(tab.index)
-          }
-          if (tab.title.includes("Codeforces")) {
-            goodIdx = tab.index
-          }
-          console.log(tab.title, tab.url)
-        }
-        chrome.tabs.update(tabs[goodIdx].id, { active: true });
-      });
-    }
-  },
-
-  {
     action: 'TABS_FIND_TAB',
     callback: query => {
-      console.log(query);
-      chrome.windows.getCurrent({}, window => {
-        groupTabsWithTitle(window.id, query);
-      });
+      findTab(query);
     }
   },
 

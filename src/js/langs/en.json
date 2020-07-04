@@ -524,12 +524,6 @@
     "switch (to) left tab",
     "left tab"
   ],
-  "TABS_FIND_CF": [
-    "find codeforces tab",
-    "switch to codeforces",
-    "codeforces",
-    "cf"
-  ],
   "TABS_FIND_TAB": [
     "find *query"
   ],
