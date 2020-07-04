@@ -1,4 +1,4 @@
-import { performActionWithDelay, openTabWithText } from '../core';
+import { performActionWithDelay, openTabWithText, groupTabsWithTitle } from '../core';
 
 
 
@@ -317,9 +317,8 @@ const commands = [
     action: 'TABS_FIND_TAB',
     callback: query => {
       console.log(query);
-      // chrome.tabs.update(tabs[0].id, { active: true });
       chrome.windows.getCurrent({}, window => {
-        openTabWithText(window.id, query);
+        groupTabsWithTitle(window.id, query);
       });
     }
   },

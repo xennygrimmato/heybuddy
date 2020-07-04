@@ -102,3 +102,43 @@ export function openTabWithText(windowId, text) {
     chrome.tabs.update(tabs[goodIdx].id, { active: true });
   });
 }
+
+// groupTabsWithTitle finds all the tabs matching the given title and groups them together.
+// TODO(abansal4032): List the matches and let the user select which one to open.
+export function groupTabsWithTitle(windowId, title) {
+  chrome.tabs.query({windowId: windowId}, tabs => {
+    let matchingIds = [];
+    for (const tab of tabs) {
+      if (tab.title === undefined) {
+        console.log(tab.index);
+        continue;
+      }
+      if (tab.title.toLowerCase().includes(title.toLowerCase())) {
+        matchingIds.push(tab.id);
+      }
+      console.log(tab.title, tab.url);
+    }
+    console.log("matchingIds", matchingIds);
+    // Move the matching tabs to the end and highlight the tabs
+    chrome.tabs.move(matchingIds, {'windowId': windowId, 'index': -1});
+    // Refetch the matching tabs for getting the updated indices to highlight.
+    // Can refactor here.
+    chrome.tabs.query({windowId: windowId}, tabs => {
+      let matchingIdxs = [];
+      for (const tab of tabs) {
+        if (tab.title === undefined) {
+          console.log(tab.index);
+          continue;
+        }
+        if (tab.title.toLowerCase().includes(title.toLowerCase())) {
+          matchingIdxs.push(tab.index);
+        }
+        console.log(tab.title, tab.url);
+      }
+      console.log("matchingIdxs", matchingIdxs);
+      if (matchingIds.length != 0) {
+        chrome.tabs.highlight({'tabs': matchingIdxs});
+      }
+    });
+  });
+}
